@@ -1,0 +1,30 @@
+from setuptools import find_packages, setup
+
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
+setup(
+    name="prodiphy",
+    version="0.0.1",
+    author="Sebastian Proost",
+    author_email="sebastian.proost@gmail.com",
+    description="Probabilistic models to examine differences between (sub-)populations",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="",
+    project_urls={
+        "Bug Tracker": "",
+    },
+    install_requires=[
+        "pymc>=5.1.1",
+        "bambi>=0.10.0"
+    ],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+    ],
+    license="Creative Commons Attribution-NonCommercial-ShareAlike 4.0. https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    packages=find_packages("src"),
+    package_dir={"": "src"},
+    python_requires=">=3.8",
+)
