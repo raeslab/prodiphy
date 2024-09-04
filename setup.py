@@ -15,10 +15,7 @@ setup(
     project_urls={
         "Bug Tracker": "",
     },
-    install_requires=[
-        "pymc>=5.1.1",
-        "bambi>=0.10.0"
-    ],
+    install_requires=["pymc>=5.1.1", "bambi>=0.10.0"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
