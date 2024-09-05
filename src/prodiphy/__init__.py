@@ -1,1 +1,1 @@
-from .prodiphy import ProDir
+from .prodir import ProDir
