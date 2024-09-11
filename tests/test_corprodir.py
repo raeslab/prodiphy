@@ -45,7 +45,7 @@ def test_corprodir():
 
     assert type(stats_df) == pd.DataFrame
     assert stats_df.shape[0] == len(labels)   # should match the number of label in the dataset
-    assert stats_df.shape[1] == 15
+    assert stats_df.shape[1] == 13
 
     for label in labels:
         assert label in stats_df["label"].tolist()

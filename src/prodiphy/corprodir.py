@@ -24,7 +24,8 @@ class CorProDir:
         self.uncorrected_model = None
         self.uncorrected_trace = None
 
-    def _create_one_hot_encoding(self, df, category, labels):
+    @staticmethod
+    def _create_one_hot_encoding(df, category, labels):
         """
         Converts the categorical column to one-hot encoded columns.
 
@@ -36,6 +37,39 @@ class CorProDir:
             df[label] = df[category].apply(lambda x: 1 if x == label else 0)
         return df
 
+    @staticmethod
+    def _compute_stats(final_data, labels):
+        """
+        Computes statistics like mean, standard deviation, HDI, etc. for delta and log2 ratios.
+
+        :param final_data: DataFrame containing prevalence data.
+        :param labels: List of unique labels.
+        :return: DataFrame of computed statistics.
+        """
+        stats = []
+        for label in labels:
+            low_delta, high_delta = az.hdi(np.array(final_data[f"{label}_delta"]))
+            low_log2_ratio, high_log2_ratio = az.hdi(np.array(final_data[f"{label}_log2_ratio"]))
+
+            stats.append(
+                {
+                    "label": label,
+                    "mean_fraction": np.mean(final_data[f"{label}_prevalence_dirch"]),
+                    "mean_estimate": np.mean(final_data[f"{label}_prevalence_est"]),
+                    "mean_delta": np.mean(final_data[f"{label}_delta"]),
+                    "std_delta": np.std(final_data[f"{label}_delta"]),
+                    "hdi_low_delta": low_delta,
+                    "hdi_high_delta": high_delta,
+                    "mean_log2_ratio": np.mean(final_data[f"{label}_log2_ratio"]),
+                    "std_log2_ratio": np.std(final_data[f"{label}_log2_ratio"]),
+                    "hdi_low_log2_ratio": low_log2_ratio,
+                    "hdi_high_log2_ratio": high_log2_ratio,
+                    "fraction_above_zero": np.mean(final_data[f"{label}_delta"] > 0),
+                    "fraction_below_zero": np.mean(final_data[f"{label}_delta"] < 0),
+                }
+            )
+        return pd.DataFrame(stats)
+
     def fit(self, reference_df, target_df, category, confounders):
         labels = list(
             set(reference_df[category].tolist() + target_df[category].tolist())
@@ -44,7 +78,6 @@ class CorProDir:
         reference_df = self._create_one_hot_encoding(reference_df, category, labels)
         target_df = self._create_one_hot_encoding(target_df, category, labels)
 
-        # Get uncorrected ET proportions
         target_counts = target_df.groupby(category).size()[labels]
 
         with pm.Model() as self.uncorrected_model:
@@ -57,7 +90,6 @@ class CorProDir:
                 draws=self.draws, chains=self.chains, cores=self.cores
             )
 
-        # make ET prevalence model on good stratum
         self.formula = f"c({', '.join(labels)}) ~ {' + '.join(confounders)}"
 
         self.model = bmb.Model(
@@ -73,57 +105,25 @@ class CorProDir:
         target_sample = target_df.sample(sample_size, replace=len(reference_df) < 1000)
         self.model.predict(self.trace, data=target_sample, kind="response")
 
-        mfinal_data = pd.DataFrame()
+        final_data = pd.DataFrame()
 
         for ix, label in enumerate(labels):
-            mfinal_data[f"{label}_prevalence_dirch"] = self.uncorrected_trace.posterior[
+            final_data[f"{label}_prevalence_dirch"] = self.uncorrected_trace.posterior[
                 f"{label}_prevalence"
             ][0]
-            mfinal_data[f"{label}_prevalence_est"] = (
+            final_data[f"{label}_prevalence_est"] = (
                 self.trace["posterior_predictive"][f"c({', '.join(labels)})"]
                 .values[0]
                 .mean(axis=1)[:, ix]
             )
 
-            mfinal_data[f"{label}_delta"] = (
-                mfinal_data[f"{label}_prevalence_dirch"]
-                - mfinal_data[f"{label}_prevalence_est"]
+            final_data[f"{label}_delta"] = (
+                final_data[f"{label}_prevalence_dirch"]
+                - final_data[f"{label}_prevalence_est"]
             )
-            mfinal_data[f"{label}_log2_ratio"] = np.log2(
-                mfinal_data[f"{label}_prevalence_dirch"]
-                / mfinal_data[f"{label}_prevalence_est"]
-            )
-
-        stats = []
-
-        for label in labels:
-            low_delta, high_delta = az.hdi(np.array(mfinal_data[f"{label}_delta"]))
-            low_log2_ratio, high_log2_ratio = az.hdi(
-                np.array(mfinal_data[f"{label}_log2_ratio"])
+            final_data[f"{label}_log2_ratio"] = np.log2(
+                final_data[f"{label}_prevalence_dirch"]
+                / final_data[f"{label}_prevalence_est"]
             )
 
-            stats.append(
-                {
-                    "label": label,
-                    "n_ref": len(reference_df),
-                    "n_target": len(target_df),
-                    "mean_fraction": np.mean(mfinal_data[f"{label}_prevalence_dirch"]),
-                    "mean_estimate": np.mean(mfinal_data[f"{label}_prevalence_est"]),
-                    "mean_delta": np.mean(mfinal_data[f"{label}_delta"]),
-                    "std_delta": np.std(mfinal_data[f"{label}_delta"]),
-                    "hdi_low_delta": low_delta,
-                    "hdi_high_delta": high_delta,
-                    "mean_log2_ratio": np.mean(mfinal_data[f"{label}_log2_ratio"]),
-                    "std_log2_ratio": np.std(mfinal_data[f"{label}_log2_ratio"]),
-                    "hdi_low_log2_ratio": low_log2_ratio,
-                    "hdi_high_log2_ratio": high_log2_ratio,
-                    "fraction_above_zero": mfinal_data[f"{label}_delta"]
-                    .apply(lambda x: 1 if x > 0 else 0)
-                    .mean(),
-                    "fraction_below_zero": mfinal_data[f"{label}_delta"]
-                    .apply(lambda x: 1 if x < 0 else 0)
-                    .mean(),
-                }
-            )
-
-        return pd.DataFrame(stats)
+        return self._compute_stats(final_data, labels)

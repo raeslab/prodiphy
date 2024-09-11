@@ -163,3 +163,5 @@ cython_debug/
 
 # notebook for some testing during development
 dev.ipynb
+
+tmp/
