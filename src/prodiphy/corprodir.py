@@ -23,6 +23,7 @@ class CorProDir:
         self.trace = None
         self.uncorrected_model = None
         self.uncorrected_trace = None
+        self.final_data = None
 
     @staticmethod
     def _create_one_hot_encoding(df, category, labels):
@@ -37,35 +38,66 @@ class CorProDir:
             df[label] = df[category].apply(lambda x: 1 if x == label else 0)
         return df
 
-    @staticmethod
-    def _compute_stats(final_data, labels):
+    def _get_final_data(self, labels):
+        """
+        Extracts relevant values from the uncorrected model and glm traces and computes derived values for each label.
+
+        This method retrieves the posterior prevalence from the uncorrected trace and the predicted prevalence
+        from the glm trace. It then calculates the delta (difference) and log2 ratio between these values
+        for each label. The computed values are stored in the `final_data` DataFrame.
+
+        :param labels: List of unique labels.
+        """
+        self.final_data = pd.DataFrame()
+
+        for ix, label in enumerate(labels):
+            self.final_data[f"{label}_prevalence_dirch"] = self.uncorrected_trace.posterior[
+                f"{label}_prevalence"
+            ][0]
+            self.final_data[f"{label}_prevalence_est"] = (
+                self.trace["posterior_predictive"][f"c({', '.join(labels)})"]
+                .values[0]
+                .mean(axis=1)[:, ix]
+            )
+
+            self.final_data[f"{label}_delta"] = (
+                    self.final_data[f"{label}_prevalence_dirch"]
+                    - self.final_data[f"{label}_prevalence_est"]
+            )
+            self.final_data[f"{label}_log2_ratio"] = np.log2(
+                self.final_data[f"{label}_prevalence_dirch"]
+                / self.final_data[f"{label}_prevalence_est"]
+            )
+
+    def _compute_stats(self, labels):
         """
         Computes statistics like mean, standard deviation, HDI, etc. for delta and log2 ratios.
 
-        :param final_data: DataFrame containing prevalence data.
         :param labels: List of unique labels.
         :return: DataFrame of computed statistics.
         """
         stats = []
         for label in labels:
-            low_delta, high_delta = az.hdi(np.array(final_data[f"{label}_delta"]))
-            low_log2_ratio, high_log2_ratio = az.hdi(np.array(final_data[f"{label}_log2_ratio"]))
+            low_delta, high_delta = az.hdi(np.array(self.final_data[f"{label}_delta"]))
+            low_log2_ratio, high_log2_ratio = az.hdi(
+                np.array(self.final_data[f"{label}_log2_ratio"])
+            )
 
             stats.append(
                 {
                     "label": label,
-                    "mean_fraction": np.mean(final_data[f"{label}_prevalence_dirch"]),
-                    "mean_estimate": np.mean(final_data[f"{label}_prevalence_est"]),
-                    "mean_delta": np.mean(final_data[f"{label}_delta"]),
-                    "std_delta": np.std(final_data[f"{label}_delta"]),
+                    "mean_fraction": np.mean(self.final_data[f"{label}_prevalence_dirch"]),
+                    "mean_estimate": np.mean(self.final_data[f"{label}_prevalence_est"]),
+                    "mean_delta": np.mean(self.final_data[f"{label}_delta"]),
+                    "std_delta": np.std(self.final_data[f"{label}_delta"]),
                     "hdi_low_delta": low_delta,
                     "hdi_high_delta": high_delta,
-                    "mean_log2_ratio": np.mean(final_data[f"{label}_log2_ratio"]),
-                    "std_log2_ratio": np.std(final_data[f"{label}_log2_ratio"]),
+                    "mean_log2_ratio": np.mean(self.final_data[f"{label}_log2_ratio"]),
+                    "std_log2_ratio": np.std(self.final_data[f"{label}_log2_ratio"]),
                     "hdi_low_log2_ratio": low_log2_ratio,
                     "hdi_high_log2_ratio": high_log2_ratio,
-                    "fraction_above_zero": np.mean(final_data[f"{label}_delta"] > 0),
-                    "fraction_below_zero": np.mean(final_data[f"{label}_delta"] < 0),
+                    "fraction_above_zero": np.mean(self.final_data[f"{label}_delta"] > 0),
+                    "fraction_below_zero": np.mean(self.final_data[f"{label}_delta"] < 0),
                 }
             )
         return pd.DataFrame(stats)
@@ -105,25 +137,6 @@ class CorProDir:
         target_sample = target_df.sample(sample_size, replace=len(reference_df) < 1000)
         self.model.predict(self.trace, data=target_sample, kind="response")
 
-        final_data = pd.DataFrame()
+        self._get_final_data(labels)
 
-        for ix, label in enumerate(labels):
-            final_data[f"{label}_prevalence_dirch"] = self.uncorrected_trace.posterior[
-                f"{label}_prevalence"
-            ][0]
-            final_data[f"{label}_prevalence_est"] = (
-                self.trace["posterior_predictive"][f"c({', '.join(labels)})"]
-                .values[0]
-                .mean(axis=1)[:, ix]
-            )
-
-            final_data[f"{label}_delta"] = (
-                final_data[f"{label}_prevalence_dirch"]
-                - final_data[f"{label}_prevalence_est"]
-            )
-            final_data[f"{label}_log2_ratio"] = np.log2(
-                final_data[f"{label}_prevalence_dirch"]
-                / final_data[f"{label}_prevalence_est"]
-            )
-
-        return self._compute_stats(final_data, labels)
+        return self._compute_stats(labels)
