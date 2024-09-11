@@ -22,7 +22,13 @@ class ProDir:
         self.chains = chains
         self.cores = cores
 
-    def fit(self, group_1_data: list[int], group_2_data: list[int], labels: list[str], verbose=False):
+    def fit(
+        self,
+        group_1_data: list[int],
+        group_2_data: list[int],
+        labels: list[str],
+        verbose=False,
+    ):
         """
         Fits a Dirichlet distribution model to the two groups and computes the
         difference (delta) and log2 ratio for each category.
