@@ -1,7 +1,4 @@
-import arviz as az
 import pandas as pd
-import pytest
-import os
 import numpy as np
 
 from prodiphy import CorProDir
@@ -9,8 +6,7 @@ from prodiphy import CorProDir
 np.random.seed(1910)
 
 
-
-def build_data(labels):
+def build_data(labels=["a", "b", "c", "d"]):
     ref_size = 100
     target_size = 50
     ref_prevalence = [0.3, 0.3, 0.2, 0.2]

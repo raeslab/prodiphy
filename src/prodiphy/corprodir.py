@@ -24,18 +24,25 @@ class CorProDir:
         self.uncorrected_model = None
         self.uncorrected_trace = None
 
+    def _create_one_hot_encoding(self, df, category, labels):
+        """
+        Converts the categorical column to one-hot encoded columns.
+
+        :param df: DataFrame containing the category.
+        :param category: Column name of the categorical variable.
+        :param labels: List of unique labels.
+        """
+        for label in labels:
+            df[label] = df[category].apply(lambda x: 1 if x == label else 0)
+        return df
+
     def fit(self, reference_df, target_df, category, confounders):
         labels = list(
             set(reference_df[category].tolist() + target_df[category].tolist())
         )
 
-        for label in labels:
-            reference_df[label] = reference_df[category].apply(
-                lambda x: 1 if x == label else 0
-            )
-            target_df[label] = target_df[category].apply(
-                lambda x: 1 if x == label else 0
-            )
+        reference_df = self._create_one_hot_encoding(reference_df, category, labels)
+        target_df = self._create_one_hot_encoding(target_df, category, labels)
 
         # Get uncorrected ET proportions
         target_counts = target_df.groupby(category).size()[labels]
@@ -62,16 +69,9 @@ class CorProDir:
             random_seed=0, chains=self.chains, draws=self.draws, cores=self.cores
         )
 
-        if len(target_df) < 1000:
-            self.model.predict(
-                self.trace,
-                data=target_df.sample(reference_df.shape[0], replace=True),
-                kind="response",
-            ) # the number samples needs to match the reference for this prediction to work
-        else:
-            self.model.predict(
-                self.trace, data=target_df.sample(n=1000, replace=False), kind="response"
-            )
+        sample_size = min(len(reference_df), 1000)
+        target_sample = target_df.sample(sample_size, replace=len(reference_df) < 1000)
+        self.model.predict(self.trace, data=target_sample, kind="response")
 
         mfinal_data = pd.DataFrame()
 
