@@ -4,6 +4,27 @@
 
 Python package that implements probabilistic models to compare (sub-)populations.
 
+## Installation
+
+Note: currently the package has not been deposited in a repository, so it needs to be installed through github.
+
+To install Prodiphy, [conda](https://conda.io/projects/conda/en/latest/index.html) is required (or miniconda).
+
+First, clone the repository to create a local copy in the current directory.
+
+```bash
+git clone https://github.com/raeslab/prodiphy
+```
+
+Then navigate to the source code, create an environment using the yaml file in the folder `docs/dev`, activate it and install the local copy of the code.
+
+```bash
+cd prodiphy
+conda env create -f docs/devenvironment.yml
+conda activate prodiphy
+pip install -e .
+```
+
 ## Usage
 
 ### ProDir Model
@@ -14,7 +35,6 @@ observed can be provided to the model, and the results will show if the model is
 prevalence of that species in the polluted vs unpolluted ecosystem.
 
 ```python
-
 from prodiphy import ProDir
 
 reference_counts = [100, 30, 20, 10]
