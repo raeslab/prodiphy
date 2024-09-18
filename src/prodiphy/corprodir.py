@@ -13,12 +13,14 @@ class CorProDir:
 
         :param chains: Number of chains to sample in parallel, default is 4
         :param cores: Number of cores to use for sampling, default is 4
+        :param draws:
         """
         self.chains = chains
         self.cores = cores
         self.draws = draws
 
         self.formula = ""
+        self.labels = []
         self.model = None
         self.trace = None
         self.uncorrected_model = None
@@ -38,24 +40,22 @@ class CorProDir:
             df[label] = df[category].apply(lambda x: 1 if x == label else 0)
         return df
 
-    def _get_final_data(self, labels):
+    def _get_final_data(self):
         """
         Extracts relevant values from the uncorrected model and glm traces and computes derived values for each label.
 
         This method retrieves the posterior prevalence from the uncorrected trace and the predicted prevalence
         from the glm trace. It then calculates the delta (difference) and log2 ratio between these values
         for each label. The computed values are stored in the `final_data` DataFrame.
-
-        :param labels: List of unique labels.
         """
         self.final_data = pd.DataFrame()
 
-        for ix, label in enumerate(labels):
+        for ix, label in enumerate(self.labels):
             self.final_data[f"{label}_prevalence_dirch"] = self.uncorrected_trace.posterior[
                 f"{label}_prevalence"
             ][0]
             self.final_data[f"{label}_prevalence_est"] = (
-                self.trace["posterior_predictive"][f"c({', '.join(labels)})"]
+                self.trace["posterior_predictive"][f"c({', '.join(self.labels)})"]
                 .values[0]
                 .mean(axis=1)[:, ix]
             )
@@ -69,15 +69,14 @@ class CorProDir:
                 / self.final_data[f"{label}_prevalence_est"]
             )
 
-    def _compute_stats(self, labels):
+    def _compute_stats(self):
         """
         Computes statistics like mean, standard deviation, HDI, etc. for delta and log2 ratios.
 
-        :param labels: List of unique labels.
         :return: DataFrame of computed statistics.
         """
         stats = []
-        for label in labels:
+        for label in self.labels:
             low_delta, high_delta = az.hdi(np.array(self.final_data[f"{label}_delta"]))
             low_log2_ratio, high_log2_ratio = az.hdi(
                 np.array(self.final_data[f"{label}_log2_ratio"])
@@ -103,26 +102,26 @@ class CorProDir:
         return pd.DataFrame(stats)
 
     def fit(self, reference_df, target_df, category, confounders):
-        labels = list(
+        self.labels = list(
             set(reference_df[category].tolist() + target_df[category].tolist())
         )
 
-        reference_df = self._create_one_hot_encoding(reference_df, category, labels)
-        target_df = self._create_one_hot_encoding(target_df, category, labels)
+        reference_df = self._create_one_hot_encoding(reference_df, category, self.labels)
+        target_df = self._create_one_hot_encoding(target_df, category, self.labels)
 
-        target_counts = target_df.groupby(category).size()[labels]
+        target_counts = target_df.groupby(category).size()[self.labels]
 
         with pm.Model() as self.uncorrected_model:
             proportions = pm.Dirichlet("proportions", a=target_counts + 1)
 
-            for ix, label in enumerate(labels):
+            for ix, label in enumerate(self.labels):
                 _ = pm.Deterministic(f"{label}_prevalence", proportions[ix])
 
             self.uncorrected_trace = pm.sample(
                 draws=self.draws, chains=self.chains, cores=self.cores
             )
 
-        self.formula = f"c({', '.join(labels)}) ~ {' + '.join(confounders)}"
+        self.formula = f"c({', '.join(self.labels)}) ~ {' + '.join(confounders)}"
 
         self.model = bmb.Model(
             self.formula,
@@ -137,6 +136,7 @@ class CorProDir:
         target_sample = target_df.sample(sample_size, replace=len(reference_df) < 1000)
         self.model.predict(self.trace, data=target_sample, kind="response")
 
-        self._get_final_data(labels)
+        self._get_final_data()
 
-        return self._compute_stats(labels)
+    def get_stats(self):
+        return self._compute_stats()

@@ -8,7 +8,6 @@ from prodiphy import ProDir
 os.environ["PYTENSOR_FLAGS"] = "cxx="
 
 
-@pytest.mark.skip(reason="Temporarily disabled to speed up testing of other components")
 def test_prodir():
     model = ProDir()
 
@@ -21,8 +20,7 @@ def test_prodir():
     model.fit(group_1_counts, group_2_counts, sub_group_labels, verbose=True)
 
     # Generate a summary of the model trace using Arviz
-    with model.model:
-        summary_df = az.summary(model.trace)
+    summary_df = model.get_stats()
 
     # Check that 'delta' and 'log2_ratio' variables are present in the summary for each label
     for l in sub_group_labels:

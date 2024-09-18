@@ -1,5 +1,6 @@
 import pymc as pm
 import numpy as np
+import arviz as az
 
 
 class ProDir:
@@ -22,6 +23,8 @@ class ProDir:
         self.chains = chains
         self.cores = cores
 
+        self.labels = []
+
     def fit(
         self,
         group_1_data: list[int],
@@ -43,6 +46,8 @@ class ProDir:
         assert len(group_1_data) == len(group_2_data)
         assert len(group_1_data) == len(labels)
 
+        self.labels = labels
+
         if verbose:
             print(f"Group 1: {', '.join([str(i) for i in group_1_data])}")
             print(f"Group 2: {', '.join([str(i) for i in group_2_data])}")
@@ -52,13 +57,21 @@ class ProDir:
             group_2_p = pm.Dirichlet("group_2_p", a=np.array(group_2_data) + 1)
 
             # Add deterministic variable with difference (delta)
-            for ix, label in enumerate(labels):
+            for ix, label in enumerate(self.labels):
                 _ = pm.Deterministic(f"delta_{label}", group_1_p[ix] - group_2_p[ix])
 
             # Add deterministic variable with log2 ratio
-            for ix, label in enumerate(labels):
+            for ix, label in enumerate(self.labels):
                 _ = pm.Deterministic(
                     f"log2_ratio_{label}", np.log2(group_2_p[ix] / group_1_p[ix])
                 )
 
             self.trace = pm.sample(chains=self.chains, cores=self.cores)
+
+    def get_stats(self):
+
+        summary_df = az.summary(
+            self.trace,
+        )
+
+        return summary_df

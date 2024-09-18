@@ -43,8 +43,9 @@ if __name__ == "__main__":
     ref_df, target_df = build_data()
 
     model = CorProDir(draws=500)
-    output = model.fit(ref_df, target_df, "label", ["age", "BMI"])
+    model.fit(ref_df, target_df, "label", ["age", "BMI"])
 
+    output = model.get_stats()
     output.to_excel("./tmp/example.xlsx")
 
     print(model.formula)
