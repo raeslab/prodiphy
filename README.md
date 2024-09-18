@@ -37,15 +37,16 @@ prevalence of that species in the polluted vs unpolluted ecosystem.
 ```python
 from prodiphy import ProDir
 
-reference_counts = [100, 30, 20, 10]
-polluted_counts = [90, 20, 5, 10]
-
-labels = ["SpeciesA", "SpeciesB", "SpeciesC", "SpeciesD"]
-
-model = ProDir()
-model.fit(reference_counts, polluted_counts, labels)
-
-summary = model.get_stats()
+if __name__ == "__main__":
+    reference_counts = [100, 30, 20, 10]
+    polluted_counts = [90, 20, 5, 10]
+    
+    labels = ["SpeciesA", "SpeciesB", "SpeciesC", "SpeciesD"]
+    
+    model = ProDir()
+    model.fit(reference_counts, polluted_counts, labels)
+    
+    summary = model.get_stats()
 ```
 
 When looking at results in `summary` below, we see the estimated proportion for each species in both ecosystems in 
