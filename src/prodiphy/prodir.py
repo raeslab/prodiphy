@@ -59,6 +59,8 @@ class ProDir:
             # Add deterministic variable with difference (delta)
             for ix, label in enumerate(self.labels):
                 _ = pm.Deterministic(f"delta_{label}", group_1_p[ix] - group_2_p[ix])
+                _ = pm.Deterministic(f"group_1_p_{label}", group_1_p[ix])
+                _ = pm.Deterministic(f"group_2_p_{label}", group_2_p[ix])
 
             # Add deterministic variable with log2 ratio
             for ix, label in enumerate(self.labels):
@@ -70,8 +72,17 @@ class ProDir:
 
     def get_stats(self):
 
+        var_names = []
+
+        for l in self.labels:
+            var_names.append(f"delta_{l}")
+            var_names.append(f"group_1_p_{l}")
+            var_names.append(f"group_2_p_{l}")
+            var_names.append(f"log2_ratio_{l}")
+
         summary_df = az.summary(
             self.trace,
+            var_names=var_names
         )
 
         return summary_df

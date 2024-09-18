@@ -28,18 +28,18 @@ def test_prodir():
         assert f"log2_ratio_{l}" in summary_df.index
 
     # Check that the proportions in group_1 match the expected values
-    for ix, v in enumerate(group_1_counts):
+    for v, l in zip(group_1_counts, sub_group_labels):
         proportion_obs = v / sum(group_1_counts)
-        assert f"group_1_p[{ix}]" in summary_df.index
-        assert summary_df.loc[f"group_1_p[{ix}]", "mean"] == pytest.approx(
+        assert f"group_1_p_{l}" in summary_df.index
+        assert summary_df.loc[f"group_1_p_{l}", "mean"] == pytest.approx(
             proportion_obs, rel=1e-1
         )
 
     # Check that the proportions in group_2 match the expected values
-    for ix, v in enumerate(group_2_counts):
+    for v, l in zip(group_2_counts, sub_group_labels):
         proportion_obs = v / sum(group_2_counts)
-        assert f"group_2_p[{ix}]" in summary_df.index
-        assert summary_df.loc[f"group_2_p[{ix}]", "mean"] == pytest.approx(
+        assert f"group_2_p_{l}" in summary_df.index
+        assert summary_df.loc[f"group_2_p_{l}", "mean"] == pytest.approx(
             proportion_obs, rel=1e-1
         )
 
