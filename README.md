@@ -6,6 +6,8 @@ Python package that implements probabilistic models to compare (sub-)populations
 
 ## Usage
 
+### ProDir Model
+
 The ProDir model can be used to compare the prevalence of specific classes in two populations. E.g. two locations with
 a similar ecosystem, one exposed to a pollutant and the other not. Counts, how many individuals per species where 
 observed can be provided to the model, and the results will show if the model is confident there is a difference in 
@@ -50,8 +52,6 @@ E.g. here the prevalence of Species C is confidently decreased as the HDI on `lo
 | group_1_p_SpeciesD  |  0.067 | 0.019 |    0.031 |     0.102 |       0     |     0     |       4462 |       2855 |       1 |
 | group_2_p_SpeciesD  |  0.085 | 0.025 |    0.041 |     0.132 |       0     |     0     |       5259 |       2906 |       1 |
 | log2_ratio_SpeciesD |  0.344 | 0.618 |   -0.79  |     1.523 |       0.009 |     0.008 |       4506 |       3332 |       1 |
-
-
 
 
 ## Contributing

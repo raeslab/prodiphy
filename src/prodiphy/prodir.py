@@ -80,9 +80,6 @@ class ProDir:
             var_names.append(f"group_2_p_{l}")
             var_names.append(f"log2_ratio_{l}")
 
-        summary_df = az.summary(
-            self.trace,
-            var_names=var_names
-        )
+        summary_df = az.summary(self.trace, var_names=var_names)
 
         return summary_df

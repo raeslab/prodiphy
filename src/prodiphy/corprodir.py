@@ -51,9 +51,9 @@ class CorProDir:
         self.final_data = pd.DataFrame()
 
         for ix, label in enumerate(self.labels):
-            self.final_data[f"{label}_prevalence_dirch"] = self.uncorrected_trace.posterior[
-                f"{label}_prevalence"
-            ][0]
+            self.final_data[f"{label}_prevalence_dirch"] = (
+                self.uncorrected_trace.posterior[f"{label}_prevalence"][0]
+            )
             self.final_data[f"{label}_prevalence_est"] = (
                 self.trace["posterior_predictive"][f"c({', '.join(self.labels)})"]
                 .values[0]
@@ -61,8 +61,8 @@ class CorProDir:
             )
 
             self.final_data[f"{label}_delta"] = (
-                    self.final_data[f"{label}_prevalence_dirch"]
-                    - self.final_data[f"{label}_prevalence_est"]
+                self.final_data[f"{label}_prevalence_dirch"]
+                - self.final_data[f"{label}_prevalence_est"]
             )
             self.final_data[f"{label}_log2_ratio"] = np.log2(
                 self.final_data[f"{label}_prevalence_dirch"]
@@ -85,8 +85,12 @@ class CorProDir:
             stats.append(
                 {
                     "label": label,
-                    "mean_fraction": np.mean(self.final_data[f"{label}_prevalence_dirch"]),
-                    "mean_estimate": np.mean(self.final_data[f"{label}_prevalence_est"]),
+                    "mean_fraction": np.mean(
+                        self.final_data[f"{label}_prevalence_dirch"]
+                    ),
+                    "mean_estimate": np.mean(
+                        self.final_data[f"{label}_prevalence_est"]
+                    ),
                     "mean_delta": np.mean(self.final_data[f"{label}_delta"]),
                     "std_delta": np.std(self.final_data[f"{label}_delta"]),
                     "hdi_low_delta": low_delta,
@@ -95,8 +99,12 @@ class CorProDir:
                     "std_log2_ratio": np.std(self.final_data[f"{label}_log2_ratio"]),
                     "hdi_low_log2_ratio": low_log2_ratio,
                     "hdi_high_log2_ratio": high_log2_ratio,
-                    "fraction_above_zero": np.mean(self.final_data[f"{label}_delta"] > 0),
-                    "fraction_below_zero": np.mean(self.final_data[f"{label}_delta"] < 0),
+                    "fraction_above_zero": np.mean(
+                        self.final_data[f"{label}_delta"] > 0
+                    ),
+                    "fraction_below_zero": np.mean(
+                        self.final_data[f"{label}_delta"] < 0
+                    ),
                 }
             )
         return pd.DataFrame(stats)
@@ -106,7 +114,9 @@ class CorProDir:
             set(reference_df[category].tolist() + target_df[category].tolist())
         )
 
-        reference_df = self._create_one_hot_encoding(reference_df, category, self.labels)
+        reference_df = self._create_one_hot_encoding(
+            reference_df, category, self.labels
+        )
         target_df = self._create_one_hot_encoding(target_df, category, self.labels)
 
         target_counts = target_df.groupby(category).size()[self.labels]
