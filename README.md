@@ -20,7 +20,7 @@ Then navigate to the source code, create an environment using the yaml file in t
 
 ```bash
 cd prodiphy
-conda env create -f docs/devenvironment.yml
+conda env create -f docs/dev/environment.yml
 conda activate prodiphy
 pip install -e .
 ```
