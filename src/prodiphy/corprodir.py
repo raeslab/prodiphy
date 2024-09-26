@@ -142,8 +142,10 @@ class CorProDir:
             random_seed=0, chains=self.chains, draws=self.draws, cores=self.cores
         )
 
-        sample_size = min(len(reference_df), 1000)
-        target_sample = target_df.sample(sample_size, replace=len(reference_df) < 1000)
+        if len(target_df) > 1000:
+            target_sample = target_df.sample(1000, replace=False)
+        else:
+            target_sample = target_df
         self.model.predict(self.trace, data=target_sample, kind="response")
 
         self._get_final_data()
