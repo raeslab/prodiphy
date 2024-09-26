@@ -8,7 +8,7 @@ Python package that implements probabilistic models to compare (sub-)populations
 
 Note: currently the package has not been deposited in a repository, so it needs to be installed through github.
 
-To install Prodiphy, [conda](https://conda.io/projects/conda/en/latest/index.html) is required (or miniconda).
+To install ProDiphy, [conda](https://conda.io/projects/conda/en/latest/index.html) is required (or miniconda).
 
 First, clone the repository to create a local copy in the current directory.
 
@@ -74,6 +74,61 @@ E.g. here the prevalence of Species C is confidently decreased as the HDI on `lo
 | group_2_p_SpeciesD  |  0.085 | 0.025 |    0.041 |     0.132 |       0     |     0     |       5259 |       2906 |       1 |
 | log2_ratio_SpeciesD |  0.344 | 0.618 |   -0.79  |     1.523 |       0.009 |     0.008 |       4506 |       3332 |       1 |
 
+## CorProDir
+
+```python
+import pandas as pd
+import numpy as np
+
+from prodiphy import CorProDir
+
+np.random.seed(1910)
+
+labels = ["a", "b", "c", "d"]
+def build_data():
+
+    ref_size = 800
+    target_size = 100
+    ref_prevalence = [0.3, 0.3, 0.2, 0.2]
+    target_prevalence = [0.3, 0.2, 0.3, 0.2]
+
+    ref_df = pd.DataFrame(
+        {
+            "age": np.random.randint(18, high=80, size=ref_size),
+            "BMI": np.random.normal(25, size=ref_size),
+            "label": np.random.choice(
+                labels, size=ref_size, replace=True, p=ref_prevalence
+            ),
+        }
+    )
+    target_df = pd.DataFrame(
+        {
+            "age": np.random.randint(18, high=80, size=target_size),
+            "BMI": np.random.normal(25, size=target_size),
+            "label": np.random.choice(
+                labels, size=target_size, replace=True, p=target_prevalence
+            ),
+        }
+    )
+
+    for label in labels:
+        ref_df[label] = ref_df["label"].apply(lambda x: 1 if x == label else 0)
+        target_df[label] = target_df["label"].apply(lambda x: 1 if x == label else 0)
+
+    return ref_df, target_df
+
+
+if __name__ == "__main__":
+    ref_df, target_df = build_data()
+
+    model = CorProDir(draws=500)
+    model.fit(ref_df, target_df, "label", ["age", "BMI"])
+
+    output = model.get_stats()
+    output.to_excel("./tmp/example.xlsx")
+
+    print(model.formula)
+```
 
 ## Contributing
 
