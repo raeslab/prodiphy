@@ -22,8 +22,11 @@ Then navigate to the source code, create an environment using the yaml file in t
 cd prodiphy
 conda env create -f docs/dev/environment.yml
 conda activate prodiphy
+pip install git+https://github.com/bambinos/bambi.git@refs/pull/847/head
 pip install -e .
 ```
+
+Note: currently only works with a development version of bambi, which needs to be installed from a PR on GitHub.
 
 ## Usage
 
@@ -126,9 +129,17 @@ if __name__ == "__main__":
 
     output = model.get_stats()
     output.to_excel("./tmp/example.xlsx")
-
-    print(model.formula)
 ```
+
+The output is shown below (note the difference from ProDir).
+
+|    | label   |   mean_fraction |   mean_estimate |   mean_delta |   std_delta |   hdi_low_delta |   hdi_high_delta |   mean_log2_ratio |   std_log2_ratio |   hdi_low_log2_ratio |   hdi_high_log2_ratio |   fraction_above_zero |   fraction_below_zero |
+|---:|:--------|----------------:|----------------:|-------------:|------------:|----------------:|-----------------:|------------------:|-----------------:|---------------------:|----------------------:|----------------------:|----------------------:|
+|  0 | d       |        0.184428 |         0.1666  |    0.0178277 |   0.0554936 |     -0.0777508  |        0.125228  |         0.15878   |         0.482594 |            -0.803177 |             1.02433   |                 0.624 |                 0.376 |
+|  1 | c       |        0.310888 |         0.20974 |    0.101148  |   0.0584871 |     -0.00760088 |        0.212862  |         0.583754  |         0.351984 |            -0.14581  |             1.18245   |                 0.942 |                 0.058 |
+|  2 | a       |        0.293853 |         0.30812 |   -0.0142665 |   0.0671975 |     -0.120816   |        0.118628  |        -0.0670092 |         0.32641  |            -0.624287 |             0.553964  |                 0.402 |                 0.598 |
+|  3 | b       |        0.210831 |         0.31554 |   -0.104709  |   0.0607522 |     -0.209621   |        0.0146693 |        -0.586071  |         0.347963 |            -1.20928  |             0.0975963 |                 0.04  |                 0.96  |
+
 
 ## Contributing
 
