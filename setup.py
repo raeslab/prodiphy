@@ -17,7 +17,7 @@ setup(
     },
     install_requires=[
         "pymc>=5.16.2",
-        "bambi>=0.14.0",
+        "bambi>=0.14.1",
         "arviz>=0.19.0",
         "numpy>=1.26.4",
         "pandas>=2.2.2",
