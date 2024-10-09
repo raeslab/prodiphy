@@ -56,6 +56,10 @@ class DeltaSlope:
             )
 
     def get_stats(self):
-        summary_df = az.summary(self.trace)
+        selected_values = ["delta_intercept", "delta_sigma", "delta_slope",
+                           "ref_intercept", "ref_sigma", "ref_slope",
+                           "target_intercept", "target_sigma", "target_slope"]
+
+        summary_df = az.summary(self.trace, var_names=selected_values)
 
         return summary_df
