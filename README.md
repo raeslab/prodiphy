@@ -8,7 +8,7 @@ Python package that implements probabilistic models to compare (sub-)populations
 
 Note: currently the package has not been deposited in a repository, so it needs to be installed through github.
 
-To install ProDiphy, [conda](https://conda.io/projects/conda/en/latest/index.html) is required (or miniconda).
+To install ProDiphy, [conda]([https://conda.io/projects/conda/en/latest/index.html](https://github.com/conda-forge/miniforge)) is required (or miniconda).
 
 First, clone the repository to create a local copy in the current directory.
 
