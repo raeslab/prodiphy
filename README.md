@@ -197,8 +197,8 @@ regression for both groups can be extracted along with the difference (delta) be
 
 Any contributions you make are **greatly appreciated**.
 
-  * Found a bug or have some suggestions? Open an issue.
-  * Pull requests are welcome! Though open an issue first to discuss which features/changes you wish to implement.
+  * Found a bug or have some suggestions? Open an [issue](https://github.com/raeslab/prodiphy/issues).
+  * Pull requests are welcome! Though open an [issue](https://github.com/raeslab/prodiphy/issues) first to discuss which features/changes you wish to implement.
 
 ## Contact
 
