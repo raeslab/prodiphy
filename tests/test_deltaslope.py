@@ -47,7 +47,7 @@ def test_deltaslope_fit(sample_data):
 
 def test_deltaslope_stats(sample_data):
     ref_df, target_df = sample_data
-    model = DeltaSlope(draws=100, tune=50, chains=2, cores=1)  # smaller values for faster test
+    model = DeltaSlope(draws=100, tune=50, chains=2, cores=1)  # Two chains are needed for the summary stats to work
     model.fit(ref_df, target_df, x="x", y="y")
 
     summary_df = model.get_stats()
@@ -56,8 +56,6 @@ def test_deltaslope_stats(sample_data):
     assert isinstance(summary_df, pd.DataFrame)
     assert "mean" in summary_df.columns
     assert "hdi_3%" in summary_df.columns
-
-    print(summary_df.to_markdown())
 
 
 def test_deltaslope_invalid_input():

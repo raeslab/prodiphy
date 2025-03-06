@@ -22,11 +22,9 @@ Then navigate to the source code, create an environment using the yaml file in t
 cd prodiphy
 conda env create -f docs/dev/environment.yml
 conda activate prodiphy
-pip install git+https://github.com/bambinos/bambi.git@refs/pull/847/head
 pip install -e .
 ```
 
-Note: currently only works with a development version of bambi, which needs to be installed from a PR on GitHub.
 
 ## Usage
 

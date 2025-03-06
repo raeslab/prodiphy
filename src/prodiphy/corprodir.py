@@ -146,6 +146,7 @@ class CorProDir:
             target_sample = target_df.sample(1000, replace=False)
         else:
             target_sample = target_df
+
         self.model.predict(self.trace, data=target_sample, kind="response")
 
         self._get_final_data()
