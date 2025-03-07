@@ -34,7 +34,9 @@ class DeltaSlope:
 
             intercepts = pm.Normal("intercepts", 0, 2, shape=2)
 
-            delta_intercept = pm.Deterministic("delta_intercept", intercepts[1] - intercepts[0])
+            delta_intercept = pm.Deterministic(
+                "delta_intercept", intercepts[1] - intercepts[0]
+            )
             delta_sigma = pm.Deterministic("delta_sigma", sigmas[1] - sigmas[0])
 
             ref_intercept = pm.Deterministic("ref_intercept", intercepts[0])
@@ -56,9 +58,17 @@ class DeltaSlope:
             )
 
     def get_stats(self):
-        selected_values = ["delta_intercept", "delta_sigma", "delta_slope",
-                           "ref_intercept", "ref_sigma", "ref_slope",
-                           "target_intercept", "target_sigma", "target_slope"]
+        selected_values = [
+            "delta_intercept",
+            "delta_sigma",
+            "delta_slope",
+            "ref_intercept",
+            "ref_sigma",
+            "ref_slope",
+            "target_intercept",
+            "target_sigma",
+            "target_slope",
+        ]
 
         summary_df = az.summary(self.trace, var_names=selected_values)
 
