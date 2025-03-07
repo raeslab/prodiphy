@@ -183,9 +183,9 @@ def test_determine_best_cluster_count(sample_data):
     comps = DMM.determine_best_cluster_count(sample_data, cluster_sizes=[3, 4, 5])
     assert isinstance(comps, pd.DataFrame)
     assert comps.shape[0] == 3
-    assert "waic" in comps.columns
+    assert "rank" in comps.columns
     assert "p_waic" in comps.columns
-    assert "d_waic" in comps.columns
+    assert "elpd_waic" in comps.columns
     assert "weight" in comps.columns
     assert "se" in comps.columns
     assert "dse" in comps.columns
