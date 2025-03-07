@@ -16,6 +16,9 @@ class DMM:
         :param samples: Number of samples to draw, default is 1000
         :param tune: Number of tuning steps, default is 1500
         """
+        if clusters < 1:
+            raise ValueError("Number of clusters must be greater than 0.")
+
         self.clusters = clusters
         self.model = None
         self.trace = None
@@ -103,6 +106,10 @@ class DMM:
         :return: A pandas DataFrame with cluster assignments and probabilities for each cluster
         :raises ValueError: If the input data is empty
         """
+
+        if self.model is None or self.trace is None:
+            raise ValueError("Model has not been fitted yet.")
+
         n_reads, n_features, priors, weights = self._prepare_data(data, None, None)
 
         with pm.Model() as recovery_model:

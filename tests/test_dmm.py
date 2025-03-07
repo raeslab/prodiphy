@@ -6,6 +6,7 @@ from scipy.stats import dirichlet
 
 from prodiphy import DMM
 
+
 @pytest.fixture
 def sample_data():
     """
@@ -16,11 +17,9 @@ def sample_data():
     """
     data = []
 
-    alphas = [[16,1,1,1,1],
-              [1,4,4,10,1],
-              [2,2,2,2,20]]
+    alphas = [[16, 1, 1, 1, 1], [1, 4, 4, 10, 1], [2, 2, 2, 2, 20]]
 
-    sample_counts = [100,100,200]
+    sample_counts = [100, 100, 200]
 
     for sample_count, alpha in zip(sample_counts, alphas):
         for j in range(sample_count):
@@ -31,6 +30,7 @@ def sample_data():
 
     df = pd.DataFrame(data)
     return df
+
 
 @pytest.fixture
 def sample_model(sample_data):
@@ -47,6 +47,15 @@ def sample_model(sample_data):
     model.fit(sample_data)
     return model
 
+
+def test_init_with_invalid_clusters():
+    """
+    Test initializing the DMM model with invalid clusters parameter.
+    """
+    with pytest.raises(ValueError):
+        DMM(clusters=-1)
+
+
 def test_init_with_default_parameters():
     """
     Test initializing the DMM model with default parameters.
@@ -59,6 +68,7 @@ def test_init_with_default_parameters():
     assert model.tune == 1500
     assert model.model is None
     assert model.trace is None
+
 
 def test_init_with_custom_parameters():
     """
@@ -73,6 +83,7 @@ def test_init_with_custom_parameters():
     assert model.model is None
     assert model.trace is None
 
+
 def test_fit_with_default_parameters(sample_data):
     """
     Test fitting the DMM model with default parameters.
@@ -86,6 +97,7 @@ def test_fit_with_default_parameters(sample_data):
     assert model.trace is not None
     assert model.model is not None
 
+
 def test_fit_with_custom_parameters(sample_data):
     """
     Test fitting the DMM model with custom parameters.
@@ -98,6 +110,7 @@ def test_fit_with_custom_parameters(sample_data):
     model.fit(ref_df, lower=10, upper=100)
     assert model.trace is not None
     assert model.model is not None
+
 
 def test_fit_with_priors_and_weights(sample_data):
     """
@@ -114,6 +127,7 @@ def test_fit_with_priors_and_weights(sample_data):
     assert model.trace is not None
     assert model.model is not None
 
+
 def test_fit_with_empty_dataframe():
     """
     Test fitting the DMM model with an empty DataFrame.
@@ -122,6 +136,7 @@ def test_fit_with_empty_dataframe():
     model = DMM(clusters=3, chains=1, cores=1, samples=5, tune=10)
     with pytest.raises(ValueError):
         model.fit(empty_df)
+
 
 def test_get_stats_returns_dataframe(sample_model):
     """
@@ -133,6 +148,7 @@ def test_get_stats_returns_dataframe(sample_model):
     stats_df = sample_model.get_stats()
     assert isinstance(stats_df, pd.DataFrame)
 
+
 def test_get_stats_with_unfitted_model():
     """
     Test that the get_stats method raises an error when called on an unfitted model.
@@ -140,3 +156,22 @@ def test_get_stats_with_unfitted_model():
     model = DMM(clusters=3)
     with pytest.raises(ValueError):
         model.get_stats()
+
+
+def test_get_clusters_with_unfitted_model(sample_data):
+    """
+    Test get_clusters method with an unfitted model.
+    """
+    model = DMM(clusters=3)
+    with pytest.raises(ValueError):
+        model.get_clusters(sample_data)
+
+
+def test_get_clusters(sample_data, sample_model):
+    """
+    Test that the get_clusters runs and returns a DataFrame.
+    """
+    cluster_df = sample_model.get_clusters(sample_data)
+    assert isinstance(cluster_df, pd.DataFrame)
+    assert cluster_df.shape[0] == sample_data.shape[0]
+    assert "C1" in cluster_df.columns

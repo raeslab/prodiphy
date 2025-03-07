@@ -82,7 +82,9 @@ def test_corprodir(sample_data):
     stats_df = model.get_stats()
 
     assert isinstance(stats_df, pd.DataFrame)
-    assert stats_df.shape[0] == len(labels)  # should match the number of labels in the dataset
+    assert stats_df.shape[0] == len(
+        labels
+    )  # should match the number of labels in the dataset
     assert stats_df.shape[1] == 13
 
     for label in labels:

@@ -7,6 +7,7 @@ from prodiphy import ProDir
 # Set PyTensor flags to suppress warning
 os.environ["PYTENSOR_FLAGS"] = "cxx="
 
+
 # @pytest.mark.skip(reason="Temporarily disabled to speed up testing of other components")
 def test_prodir():
     model = ProDir()

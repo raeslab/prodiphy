@@ -9,13 +9,14 @@ from prodiphy import DeltaSlope
 # Set PyTensor flags to suppress warning
 os.environ["PYTENSOR_FLAGS"] = "cxx="
 
+
 @pytest.fixture
 def sample_data():
     x_ref = np.random.randint(0, 100, size=200)
-    y_ref = x_ref * 2 + 10 + np.random.normal(0,2,size=200)
+    y_ref = x_ref * 2 + 10 + np.random.normal(0, 2, size=200)
 
     x_target = np.random.randint(0, 100, size=200)
-    y_target = x_target * 1.5 + 9 + np.random.normal(0,3,size=200)
+    y_target = x_target * 1.5 + 9 + np.random.normal(0, 3, size=200)
 
     ref_df = pd.DataFrame({"x": x_ref, "y": y_ref})
     target_df = pd.DataFrame({"x": x_target, "y": y_target})
@@ -37,7 +38,9 @@ def test_deltaslope_init():
 
 def test_deltaslope_fit(sample_data):
     ref_df, target_df = sample_data
-    model = DeltaSlope(draws=100, tune=50, chains=1, cores=1)  # smaller values for faster test
+    model = DeltaSlope(
+        draws=100, tune=50, chains=1, cores=1
+    )  # smaller values for faster test
     model.fit(ref_df, target_df, x="x", y="y")
 
     assert model.model is not None
@@ -47,7 +50,9 @@ def test_deltaslope_fit(sample_data):
 
 def test_deltaslope_stats(sample_data):
     ref_df, target_df = sample_data
-    model = DeltaSlope(draws=100, tune=50, chains=2, cores=1)  # Two chains are needed for the summary stats to work
+    model = DeltaSlope(
+        draws=100, tune=50, chains=2, cores=1
+    )  # Two chains are needed for the summary stats to work
     model.fit(ref_df, target_df, x="x", y="y")
 
     summary_df = model.get_stats()
