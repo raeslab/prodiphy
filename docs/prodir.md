@@ -1,4 +1,4 @@
-# ProDir Model
+# ProDir
 
 The ProDir model can be used to compare the prevalence of specific classes in two populations. E.g. two locations with
 a similar ecosystem, one exposed to a pollutant and the other not. Counts, how many individuals per species where 

@@ -72,7 +72,7 @@ class DMM:
             # Run trace
             self.trace = pm.sample(self.samples, cores=self.cores, tune=self.tune, chains=self.chains, target_accept=0.90, idata_kwargs={"log_likelihood": True})
 
-    def get_stats(self):
+    def get_stats(self, chain_idx=0):
         """
         Returns a summary of the trace in Arviz format. As different clusters may have different indices in different
         chains, only the first chain is considered. This however makes it impossible to compute rhat values.
@@ -83,6 +83,6 @@ class DMM:
         if self.model is None or self.trace is None:
             raise ValueError("Model has not been fitted yet.")
 
-        summary_df = az.summary(self.trace, coords={"chain": [0]})
+        summary_df = az.summary(self.trace, coords={"chain": [chain_idx]})
 
         return summary_df

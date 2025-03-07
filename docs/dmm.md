@@ -1,6 +1,10 @@
-# DMM - Dirichlet Multinomial Mixture model
+# DMM - Dirichlet Multinomial Mixture
 
-
+A Dirichlet Multinomial Mixture (DMM) model is a probabilistic approach for clustering categorical data, such as word 
+distributions in text documents or species abundances in biological samples. It extends the 
+Dirichlet-multinomial distribution by incorporating a mixture model, allowing data points to be grouped into 
+latent clusters, each with its own characteristic distribution. This enables the model to account for underlying 
+population heterogeneity and better capture variations in observed categorical counts.
 
 ## Example Usage
 
@@ -51,10 +55,10 @@ if __name__ == "__main__":
     az.plot_compare(comp_waic)
 
     plt.tight_layout()
-    plt.savefig("./tmp/example_4_waic.png")
+    plt.savefig("./example_4_waic.png")
 ```
 
-The plot below shows the WAIC scores for models with 3, 4 and 5 clusters. While The model with 5 clusters has the 
+The plot below shows the widely applicable information criterion (WAIC) scores for models with 3, 4 and 5 clusters. While The model with 5 clusters has the 
 lowest WAIC score, there is no difference between the models with 4 and 5 clusters. Hence, the model with 4 clusters is
 preferred as it is simpler.
 
