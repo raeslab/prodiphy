@@ -37,6 +37,36 @@ def sample_data():
     return ref_df, target_df, labels
 
 
+@pytest.fixture
+def sample_data_large():
+    labels = ["a", "b", "c", "d"]
+    ref_size = 100
+    target_size = 1100  # Needs to be > 1000
+    ref_prevalence = [0.3, 0.3, 0.2, 0.2]
+    target_prevalence = [0.3, 0.2, 0.3, 0.2]
+
+    ref_df = pd.DataFrame(
+        {
+            "age": np.random.randint(18, high=80, size=ref_size),
+            "BMI": np.random.normal(25, size=ref_size),
+            "label": np.random.choice(
+                labels, size=ref_size, replace=True, p=ref_prevalence
+            ),
+        }
+    )
+    target_df = pd.DataFrame(
+        {
+            "age": np.random.randint(18, high=80, size=target_size),
+            "BMI": np.random.normal(25, size=target_size),
+            "label": np.random.choice(
+                labels, size=target_size, replace=True, p=target_prevalence
+            ),
+        }
+    )
+
+    return ref_df, target_df, labels
+
+
 def test_init_defaults():
     """Test default initialization of the CorProDir class."""
     model = CorProDir()
@@ -107,3 +137,22 @@ def test_corprodir(sample_data):
     ]
     for col in expected_columns:
         assert col in stats_df.columns
+
+
+def test_corprodir(sample_data_large):
+    """
+    Test the CorProDir class with sample data large.
+
+    This test emulates an edge case, but it doesn't seem to matter anymore since the update in bambi (will be removed
+    once confirmed).
+    """
+    n_draws = 100
+    ref_df, target_df, labels = sample_data_large
+
+    model = CorProDir(draws=n_draws, chains=2, cores=2)
+
+    model.fit(ref_df, target_df, "label", ["age", "BMI"])
+
+    stats_df = model.get_stats()
+
+    assert isinstance(stats_df, pd.DataFrame)

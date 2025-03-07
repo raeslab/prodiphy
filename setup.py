@@ -22,7 +22,7 @@ setup(
         "numpy>=1.26.4",
         "pandas>=2.2.2",
         "tabulate>=0.9.0",
-        "scipy>=1.7.3"
+        "scipy>=1.7.3",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
