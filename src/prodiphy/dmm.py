@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import arviz as az
 
+from typing import Literal
 
 class DMM:
     def __init__(self, clusters: int, chains=4, cores=4, samples=1000, tune=1500):
@@ -159,3 +160,33 @@ class DMM:
             raise ValueError("Model has not been fitted yet.")
 
         return az.summary(self.trace, coords={"chain": [chain_idx]})
+
+    @staticmethod
+    def determine_best_cluster_count(df, cluster_sizes=None, tune=1000, samples=500, chains=2, cores=2, lower=10,
+                                     upper=30, ic: Literal["waic", "loo"]="waic") -> pd.DataFrame:
+        """
+        Determines the best number of clusters by fitting models with different cluster counts
+        and comparing them using WAIC.
+
+        :param df: A pandas DataFrame with integer counts.
+        :param cluster_sizes: A list specifying the cluster sizes to evaluate.
+        :param tune: Number of tuning steps for each model.
+        :param samples: Number of samples to draw for each model.
+        :param chains: Number of chains to sample in parallel.
+        :param cores: Number of cores to use for sampling.
+        :param lower: Lower bound for the concentration parameter.
+        :param upper: Upper bound for the concentration parameter.
+        :param ic: Information criterion to use for comparison ("waic" or "loo").
+        :return: A DataFrame with comparisons (from Arviz compare).
+        """
+
+        cluster_sizes = cluster_sizes or [3, 4, 5]
+
+        models = {}
+        for i in cluster_sizes:
+            model = DMM(clusters=i, tune=tune, samples=samples, chains=chains, cores=cores)
+            model.fit(df, lower=lower, upper=upper)
+            models[f"{i}_clusters"] = model.trace
+
+        comp = az.compare(models, ic=ic)
+        return comp

@@ -175,3 +175,18 @@ def test_get_clusters(sample_data, sample_model):
     assert isinstance(cluster_df, pd.DataFrame)
     assert cluster_df.shape[0] == sample_data.shape[0]
     assert "C1" in cluster_df.columns
+
+def test_determine_best_cluster_count(sample_data):
+    """
+    Test determine_best_cluster_count method with default parameters.
+    """
+    comps = DMM.determine_best_cluster_count(sample_data, cluster_sizes=[3, 4, 5])
+    assert isinstance(comps, pd.DataFrame)
+    assert comps.shape[0] == 3
+    assert "waic" in comps.columns
+    assert "p_waic" in comps.columns
+    assert "d_waic" in comps.columns
+    assert "weight" in comps.columns
+    assert "se" in comps.columns
+    assert "dse" in comps.columns
+    assert "warning" in comps.columns
