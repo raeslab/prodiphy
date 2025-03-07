@@ -5,6 +5,7 @@ import arviz as az
 
 from typing import Literal
 
+
 class DMM:
     def __init__(self, clusters: int, chains=4, cores=4, samples=1000, tune=1500):
         """
@@ -162,8 +163,17 @@ class DMM:
         return az.summary(self.trace, coords={"chain": [chain_idx]})
 
     @staticmethod
-    def determine_best_cluster_count(df, cluster_sizes=None, tune=1000, samples=500, chains=2, cores=2, lower=10,
-                                     upper=30, ic: Literal["waic", "loo"]="waic") -> pd.DataFrame:
+    def determine_best_cluster_count(
+        df,
+        cluster_sizes=None,
+        tune=1000,
+        samples=500,
+        chains=2,
+        cores=2,
+        lower=10,
+        upper=30,
+        ic: Literal["waic", "loo"] = "waic",
+    ) -> pd.DataFrame:
         """
         Determines the best number of clusters by fitting models with different cluster counts
         and comparing them using WAIC.
@@ -184,7 +194,9 @@ class DMM:
 
         models = {}
         for i in cluster_sizes:
-            model = DMM(clusters=i, tune=tune, samples=samples, chains=chains, cores=cores)
+            model = DMM(
+                clusters=i, tune=tune, samples=samples, chains=chains, cores=cores
+            )
             model.fit(df, lower=lower, upper=upper)
             models[f"{i}_clusters"] = model.trace
 

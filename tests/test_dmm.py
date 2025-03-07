@@ -176,6 +176,7 @@ def test_get_clusters(sample_data, sample_model):
     assert cluster_df.shape[0] == sample_data.shape[0]
     assert "C1" in cluster_df.columns
 
+
 def test_determine_best_cluster_count(sample_data):
     """
     Test determine_best_cluster_count method with default parameters.
