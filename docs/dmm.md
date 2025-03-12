@@ -8,6 +8,11 @@ population heterogeneity and better capture variations in observed categorical c
 
 ## Example Usage
 
+The DMM class can be used to fit a Dirichlet Multinomial Mixture model to a dataset and determine the optimal number of
+clusters. Though, a single DMM model can also be used to fit a specific number of clusters and then assign data points
+to one of those clusters.
+
+### Determining the optimal number of clusters
 In the example below we'll generate a synthetic dataset with 4 clusters, each with a different distribution of 5 species. 
 We'll then fit the DMM model to the data and compare the WAIC scores for models with 3, 4 and 5 clusters to see which is 
 optimal.
@@ -42,20 +47,14 @@ if __name__ == "__main__":
 
     df = pd.DataFrame(data)
 
-    models = {}
-    for i in [3, 4, 5]:
-        model = DMM(clusters=i, tune=1000, samples=500, chains=2, cores=2)
-        model.fit(df, lower=10, upper=30)
-        output = model.get_stats()
+    # determine the optimal number of clusters (3, 4 or 5)
+    clusters = [3, 4, 5]
+    comps = DMM.determine_best_cluster_count(df, cluster_sizes=clusters, tune=1000, samples=500, chains=2, cores=2, lower=10, upper=30, ic="waic")
 
-        models[f"{i}_clusters"] = model.trace
-
-    comp_waic = az.compare(models, ic="waic")
-
-    az.plot_compare(comp_waic)
+    az.plot_compare(comps)
 
     plt.tight_layout()
-    plt.savefig("./example_4_waic.png")
+    plt.savefig("./example_waic.png")
 ```
 
 The plot below shows the widely applicable information criterion (WAIC) scores for models with 3, 4 and 5 clusters. While The model with 5 clusters has the 
@@ -63,4 +62,50 @@ lowest WAIC score, there is no difference between the models with 4 and 5 cluste
 preferred as it is simpler.
 
 ![WAIC comparison](./img/example_4_waic.png)
+
+### Assigning data points to clusters
+
+Here we'll fit a 3-cluster DMM model to a synthetic dataset and assign each data point to one of the clusters.
+
+```python
+from prodiphy import DMM
+import numpy as np
+import pandas as pd
+from random import shuffle
+from scipy.stats import dirichlet
+
+if __name__ == "__main__":
+    # create a synthetic dataset with 3 clusters
+    data = []
+
+    alphas = [[16,1,1,1,1],
+              [1,4,4,10,1],
+              [2,2,2,2,20]]
+
+    sample_count = [200,200,400]
+
+    for i in range(3):
+        alpha = alphas[i]
+        for j in range(sample_count[i]):
+            pvals = dirichlet.rvs(alpha, size=1)[0]
+            data.append(np.random.multinomial(1000, pvals))
+
+    shuffle(data)
+
+    df = pd.DataFrame(data)
+
+    model = DMM(clusters=3, tune=500, samples=500, chains=2, cores=2)
+    model.fit(df, lower=10, upper=30)
+    output = model.get_stats()
+
+
+    clusters = model.get_clusters(df)
+    
+    output.to_excel(f"./example_output.xlsx")
+    clusters.to_excel(f"./example_clusters.xlsx")
+
+```
+
+This will create two Excel files: `example_output.xlsx` will contain the parameters of the model and
+`example_clusters.xlsx` will assign each data point to one of the clusters.
 
