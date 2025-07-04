@@ -46,7 +46,7 @@ if __name__ == "__main__":
     summary = model.get_stats()
 ```
 
-For more details including the output of this example, see the [ProDir documentation](./docs/prodir).
+For more details including the output of this example, see the [ProDir documentation](./docs/prodir.md).
 
 ## Usage
 
