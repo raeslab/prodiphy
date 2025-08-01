@@ -31,6 +31,7 @@ class ProDir:
         group_2_data: list[int],
         labels: list[str],
         verbose=False,
+        sample_kwargs=None,
     ):
         """
         Fits a Dirichlet distribution model to the two groups and computes the
@@ -40,9 +41,11 @@ class ProDir:
         :param group_2_data: List of integer counts for the second group
         :param labels: List of category labels corresponding to the data
         :param verbose: If True, prints the input data, default is False
-
+        :param sample_kwargs: Additional keyword arguments to pass to pm.sample()
         :raises AssertionError: If the lengths of `group_1_data`, `group_2_data`, and `labels` are not equal
         """
+        if sample_kwargs is None:
+            sample_kwargs = {}
         assert len(group_1_data) == len(group_2_data)
         assert len(group_1_data) == len(labels)
 
@@ -68,7 +71,7 @@ class ProDir:
                     f"log2_ratio_{label}", np.log2(group_2_p[ix] / group_1_p[ix])
                 )
 
-            self.trace = pm.sample(chains=self.chains, cores=self.cores)
+            self.trace = pm.sample(chains=self.chains, cores=self.cores, **sample_kwargs)
 
     def get_stats(self):
 

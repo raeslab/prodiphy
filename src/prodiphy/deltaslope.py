@@ -19,8 +19,11 @@ class DeltaSlope:
         self.chains = chains
         self.cores = cores
 
-    def fit(self, reference_df: pd.DataFrame, target_df: pd.DataFrame, x: str, y: str):
+    def fit(self, reference_df: pd.DataFrame, target_df: pd.DataFrame, x: str, y: str, sample_kwargs: dict = None):
         df = _combine_dataframes(reference_df[[x, y]], target_df[[x, y]]).dropna()
+
+        if sample_kwargs is None:
+            sample_kwargs = {}
 
         with pm.Model() as self.model:
             x = pm.Data("x", df[x])
@@ -54,7 +57,7 @@ class DeltaSlope:
             )
 
             self.trace = pm.sample(
-                self.draws, tune=self.tune, chains=self.chains, cores=self.cores
+                self.draws, tune=self.tune, chains=self.chains, cores=self.cores, **sample_kwargs
             )
 
     def get_stats(self):

@@ -109,7 +109,7 @@ class CorProDir:
             )
         return pd.DataFrame(stats)
 
-    def fit(self, reference_df, target_df, category, confounders):
+    def fit(self, reference_df, target_df, category, confounders, sample_kwargs: dict = None):
         self.labels = list(
             set(reference_df[category].tolist() + target_df[category].tolist())
         )
@@ -120,6 +120,9 @@ class CorProDir:
         target_df = self._create_one_hot_encoding(target_df, category, self.labels)
 
         target_counts = target_df.groupby(category).size()[self.labels]
+
+        if sample_kwargs is None:
+            sample_kwargs = {}
 
         with pm.Model() as self.uncorrected_model:
             proportions = pm.Dirichlet("proportions", a=target_counts + 1)
@@ -139,7 +142,7 @@ class CorProDir:
             family="multinomial",
         )
         self.trace = self.model.fit(
-            random_seed=0, chains=self.chains, draws=self.draws, cores=self.cores
+            random_seed=0, chains=self.chains, draws=self.draws, cores=self.cores, **sample_kwargs
         )
 
         # This check was needed, but seems to be unnecessary with the updates in bambi

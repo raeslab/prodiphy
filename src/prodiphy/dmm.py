@@ -67,7 +67,7 @@ class DMM:
 
         return model, w, p, conc, components
 
-    def fit(self, data: pd.DataFrame, lower=1, upper=500, priors=None, weights=None):
+    def fit(self, data: pd.DataFrame, lower=1, upper=500, priors=None, weights=None, sample_kwargs=None):
         """
         Fits a Dirichlet Multinomial Mixture model to the input data.
 
@@ -76,8 +76,12 @@ class DMM:
         :param upper: Upper bound for the concentration parameter
         :param priors: Prior probabilities for the features within each cluster (shape = n_clusters, n_features)
         :param weights: Prior probabilities for the clusters' prevalence
+        :param sample_kwargs: Additional keyword arguments to pass to pm.sample()
         """
         n_reads, n_features, priors, weights = self._prepare_data(data, priors, weights)
+
+        if sample_kwargs is None:
+            sample_kwargs = {}
 
         with pm.Model() as self.model:
             _, w, p, conc, components = self._build_model_components(
@@ -93,6 +97,7 @@ class DMM:
                 chains=self.chains,
                 target_accept=0.90,
                 idata_kwargs={"log_likelihood": True},
+                **sample_kwargs
             )
 
     def get_clusters(self, data, chain_idx=0):
