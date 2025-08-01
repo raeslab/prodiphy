@@ -71,7 +71,9 @@ class ProDir:
                     f"log2_ratio_{label}", np.log2(group_2_p[ix] / group_1_p[ix])
                 )
 
-            self.trace = pm.sample(chains=self.chains, cores=self.cores, **sample_kwargs)
+            self.trace = pm.sample(
+                chains=self.chains, cores=self.cores, **sample_kwargs
+            )
 
     def get_stats(self):
 

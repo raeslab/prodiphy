@@ -67,7 +67,15 @@ class DMM:
 
         return model, w, p, conc, components
 
-    def fit(self, data: pd.DataFrame, lower=1, upper=500, priors=None, weights=None, sample_kwargs=None):
+    def fit(
+        self,
+        data: pd.DataFrame,
+        lower=1,
+        upper=500,
+        priors=None,
+        weights=None,
+        sample_kwargs=None,
+    ):
         """
         Fits a Dirichlet Multinomial Mixture model to the input data.
 
@@ -97,7 +105,7 @@ class DMM:
                 chains=self.chains,
                 target_accept=0.90,
                 idata_kwargs={"log_likelihood": True},
-                **sample_kwargs
+                **sample_kwargs,
             )
 
     def get_clusters(self, data, chain_idx=0):
