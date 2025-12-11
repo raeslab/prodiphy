@@ -25,6 +25,8 @@ conda activate prodiphy
 pip install -e .
 ```
 
+**Note that creating the environment can take a few minutes as there are some fairly sizeable dependencies required for Prodiphy.**
+
 ## Quick Start
 
 The following code snippet shows how to use the ProDir model to compare two populations. The model is used here to compare 
