@@ -12,6 +12,15 @@ ProDiphy is a Python package that implements probabilistic models to compare (su
 - **DMM**: Dirichlet Multinomial Mixture model to detect clusters with different prevalence patterns
 - **GMvM**: Gaussian Multivariate Mixture model for clustering continuous multivariate data
 
+## Configuration
+
+This project uses modern Python packaging standards with all configuration centralized in `pyproject.toml`:
+- **Package metadata**: Dependencies, version, authors
+- **Build system**: PEP 517/518 compliant (setuptools backend)
+- **Testing**: pytest configuration
+- **Linting/Formatting**: ruff configuration
+- **Coverage**: coverage.py configuration
+
 ## Development Commands
 
 ### Installation and Environment Setup
