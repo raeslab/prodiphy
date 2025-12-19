@@ -167,3 +167,4 @@ dev.ipynb
 tmp/
 
 example*.py
+*.xlsx

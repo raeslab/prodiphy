@@ -1,4 +1,4 @@
-name: Run Black
+name: Run Ruff
 on: [ push ]
 jobs:
   build:
@@ -12,13 +12,15 @@ jobs:
         with:
           python-version: "3.10"
           architecture: 'x64'
-      - run: pip install black
-      - run: black --check ./
-      - name: If needed, commit black changes to a new pull request
+      - run: pip install ruff
+      - run: ruff check .
+      - run: ruff format --check .
+      - name: If needed, commit ruff changes to a new pull request
         if: failure()
         run: |
-          black ./
-          git config --global user.name autoblack_push
+          ruff check --fix .
+          ruff format .
+          git config --global user.name autoruff_push
           git config --global user.email '${GITHUB_ACTOR}@users.noreply.github.com'
-          git commit -am "fixup! Format Python code with psf/black push"
+          git commit -am "fixup! Format and lint Python code with ruff"
           git push

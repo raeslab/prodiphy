@@ -1,0 +1,50 @@
+# Ruff configuration file
+# See https://docs.astral.sh/ruff/configuration/
+
+# Same line length as Black's default
+line-length = 88
+
+# Assume Python 3.10+
+target-version = "py310"
+
+[lint]
+# Enable pycodestyle (E, W), Pyflakes (F), isort (I), and other useful rules
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "PTH", # flake8-use-pathlib
+]
+
+# Ignore some rules that may be too strict for this project
+ignore = [
+    "E501",  # Line too long (handled by formatter)
+    "PTH123", # Path.open should be used instead of built-in open
+]
+
+# Allow autofix for all enabled rules
+fixable = ["ALL"]
+unfixable = []
+
+# Exclude common directories
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+]
+
+[format]
+# Use Black-compatible formatting
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
