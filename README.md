@@ -59,6 +59,7 @@ available:
   * [CorProDir](./docs/corprodir.md): Model to compare the prevalence of specific classes in two populations while correcting for covariates.
   * [DeltaSlope](./docs/deltaslope.md): Model to compare the slope, intercept and spread of a linear regression between two groups.
   * [DMM](./docs/dmm.md): Dirichlet Multinomial Mixture model to detect clusters with different prevalence of classes.
+  * [GMvM](./docs/gmvm.md): Gaussian Multivariate Mixture model for clustering continuous multivariate data.
 
 
 ## Contributing
