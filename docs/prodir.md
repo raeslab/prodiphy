@@ -10,10 +10,16 @@ prevalence of that species in the polluted vs unpolluted ecosystem.
 Assume there are $K$ classes and two groups $g \in \{1,2\}$. Define
 
 $$
-\mathbf{x}_g = (x_{g1}, \dots, x_{gK}),\qquad
-N_g = \sum_{k=1}^{K} x_{gk},\qquad
-\mathbf{p}_g = (p_{g1}, \dots, p_{gK}),\qquad
-\sum_{k=1}^{K} p_{gk} = 1.
+\mathbf{x}_g = (x_{g1}, \dots, x_{gK})
+$$
+$$
+N_g = \sum_{k=1}^{K} x_{gk}
+$$
+$$
+\mathbf{p}_g = (p_{g1}, \dots, p_{gK})
+$$
+$$
+\sum_{k=1}^{K} p_{gk} = 1
 $$
 
 Here, $\mathbf{x}_g$ is the observed count vector in group $g$, $N_g$ is the total sample size,
@@ -22,32 +28,35 @@ and $\mathbf{p}_g$ is the latent class-prevalence vector.
 Using a symmetric Dirichlet prior and a multinomial observation model:
 
 $$
-\mathbf{p}_g \sim \mathrm{Dirichlet}(\mathbf{1}),
-\qquad
-\mathbf{x}_g \mid \mathbf{p}_g \sim \mathrm{Multinomial}(N_g, \mathbf{p}_g).
+\mathbf{p}_g \sim \mathrm{Dirichlet}(\mathbf{1})
+$$
+$$
+\mathbf{x}_g \mid \mathbf{p}_g \sim \mathrm{Multinomial}(N_g, \mathbf{p}_g)
 $$
 
 By Dirichlet--multinomial conjugacy, the posterior is:
 
 $$
 \mathbf{p}_g \mid \mathbf{x}_g \sim
-\mathrm{Dirichlet}(\mathbf{x}_g + \mathbf{1}).
+\mathrm{Dirichlet}(\mathbf{x}_g + \mathbf{1})
 $$
 
 This is exactly what the implementation samples from via:
 
 $$
-\mathbf{p}_1 \sim \mathrm{Dirichlet}(\mathbf{x}_1 + \mathbf{1}),
-\qquad
-\mathbf{p}_2 \sim \mathrm{Dirichlet}(\mathbf{x}_2 + \mathbf{1}).
+\mathbf{p}_1 \sim \mathrm{Dirichlet}(\mathbf{x}_1 + \mathbf{1})
+$$
+$$
+\mathbf{p}_2 \sim \mathrm{Dirichlet}(\mathbf{x}_2 + \mathbf{1})
 $$
 
 For each class $k$, ProDir reports posterior draws of two effect-size quantities:
 
 $$
-\Delta_k = p_{1k} - p_{2k},
-\qquad
-R_k = \log_2\left(\frac{p_{2k}}{p_{1k}}\right).
+\Delta_k = p_{1k} - p_{2k}
+$$
+$$
+R_k = \log_2\left(\frac{p_{2k}}{p_{1k}}\right)
 $$
 
 Inference is performed by Monte Carlo sampling from the posterior; summary statistics (mean, SD, and HDI intervals)
