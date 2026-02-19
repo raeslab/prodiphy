@@ -7,10 +7,17 @@ prevalence of that species in the polluted vs unpolluted ecosystem.
 
 ## Mathematical formulation
 
-Assume there are $K$ classes and two groups $g \in \{1,2\}$. Let
-$\mathbf{x}_g = (x_{g1}, \dots, x_{gK})$ be the observed class counts in group $g$, with
-$N_g = \sum_{k=1}^{K} x_{gk}$. The latent class-prevalence vector for group $g$ is
-$\mathbf{p}_g = (p_{g1}, \dots, p_{gK})$, where $\sum_k p_{gk} = 1$.
+Assume there are $K$ classes and two groups $g \in \{1,2\}$. Define
+
+$$
+\mathbf{x}_g = (x_{g1}, \dots, x_{gK}),\qquad
+N_g = \sum_{k=1}^{K} x_{gk},\qquad
+\mathbf{p}_g = (p_{g1}, \dots, p_{gK}),\qquad
+\sum_{k=1}^{K} p_{gk} = 1.
+$$
+
+Here, $\mathbf{x}_g$ is the observed count vector in group $g$, $N_g$ is the total sample size,
+and $\mathbf{p}_g$ is the latent class-prevalence vector.
 
 Using a symmetric Dirichlet prior and a multinomial observation model:
 
