@@ -59,7 +59,7 @@ $$
 R_k = \log_2\left(\frac{p_{2k}}{p_{1k}}\right)
 $$
 
-Inference is performed by Monte Carlo sampling from the posterior; summary statistics (mean, SD, and HDI intervals)
+Inference is performed by sampling from the posterior using PyMC's sampler; summary statistics (mean, SD, and HDI intervals)
 for $\Delta_k$, $R_k$, and each $p_{gk}$ are returned.
 
 ## Example Usage
