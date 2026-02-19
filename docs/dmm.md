@@ -12,7 +12,7 @@ Assume there are $N$ samples, $K$ observed categories (features), and $C$ latent
 For sample $i$, define the count vector
 
 $$
-\mathbf{x}_i = (x_{i1} \, , \, \dots \, , \, x_{iK})
+\mathbf{x}_i = (x_{i1}, \dots, x_{iK})
 $$
 $$
 n_i = \sum_{k=1}^{K} x_{ik}
@@ -24,27 +24,27 @@ $$
 n = \mathrm{median}_i(n_i)
 $$
 
-and each mixture component $c \in \{1 \, , \, \dots \, , \, C\}$ has:
+and each mixture component $c \in \{1,\dots,C\}$ has:
 
-- mixture weight $w_c$,
+- mixture weight $w_c$
 - category proportions:
 
 $$
-\mathbf{p}_c = (p_{c1} \, , \, \dots \, , \, p_{cK}) \, , \, \quad \sum_{k=1}^{K} p_{ck}=1
+\mathbf{p}_c = (p_{c1},\dots,p_{cK}) \quad \sum_{k=1}^{K} p_{ck}=1
 $$
 
-- concentration (overdispersion) parameter $\alpha_c > 0$.
+- concentration (overdispersion) parameter $\alpha_c > 0$
 
 The priors used by the model are:
 
 $$
-\mathbf{w} = (w_1 \, , \, \dots \, , \, w_C) \sim \mathrm{Dirichlet}(\boldsymbol{\gamma})
+\mathbf{w} = (w_1,\dots,w_C) \sim \mathrm{Dirichlet}(\boldsymbol{\gamma})
 $$
 $$
 \mathbf{p}_c \sim \mathrm{Dirichlet}(\boldsymbol{\beta})
 $$
 $$
-\alpha_c \sim \mathrm{Uniform}(\text{lower} \, , \, \text{upper})
+\alpha_c \sim \mathrm{Uniform}(\text{lower},\text{upper})
 $$
 
 where by default $\boldsymbol{\gamma}$ is uniform over clusters and
@@ -59,26 +59,26 @@ $$
 Conditioned on cluster membership $z_i$, each sample follows:
 
 $$
-\mathbf{x}_i \mid z_i=c \sim \mathrm{DirichletMultinomial}(n \, , \, \mathbf{a}_c)
+\mathbf{x}_i \mid z_i=c \sim \mathrm{DirichletMultinomial}(n, \mathbf{a}_c)
 $$
 
 Marginalizing over latent cluster assignments gives the mixture likelihood used in PyMC:
 
 $$
-p(\mathbf{x}_i \mid \Theta) = \sum_{c=1}^{C} w_c\,\mathrm{DM}(\mathbf{x}_i \mid n \, , \, \mathbf{a}_c)
+p(\mathbf{x}_i \mid \Theta) = \sum_{c=1}^{C} w_c\,\mathrm{DM}(\mathbf{x}_i \mid n, \mathbf{a}_c)
 $$
 
 with parameter set
 
 $$
-\Theta = \{\mathbf{w} \, , \, \mathbf{p}_{1:C} \, , \, \alpha_{1:C}\}
+\Theta = \{\mathbf{w},\mathbf{p}_{1:C},\alpha_{1:C}\}
 $$
 
 After posterior sampling, cluster assignment for each sample is obtained from posterior predictive draws of
 the latent categorical index:
 
 $$
-\Pr(z_i=c \mid \mathbf{x}_i \, , \, \text{data}) \propto w_c\,\mathrm{DM}(\mathbf{x}_i \mid n \, , \, \mathbf{a}_c)
+\Pr(z_i=c \mid \mathbf{x}_i, \text{data}) \propto w_c\,\mathrm{DM}(\mathbf{x}_i \mid n, \mathbf{a}_c)
 $$
 
 and the reported cluster is the component with the highest posterior assignment probability.
@@ -185,3 +185,4 @@ if __name__ == "__main__":
 
 This will create two Excel files: `example_output.xlsx` will contain the parameters of the model and
 `example_clusters.xlsx` will assign each data point to one of the clusters.
+
