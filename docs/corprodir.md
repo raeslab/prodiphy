@@ -4,6 +4,68 @@ The CorProDir (Corrected Proportional Dirichlet) model extends the basic ProDir 
 covariates when comparing proportions between two populations. This makes it possible to account for confounding 
 factors that might influence the observed differences.
 
+## Mathematical formulation
+
+CorProDir compares category prevalences for a target cohort against prevalences expected from a reference cohort after
+adjusting for confounders. Let there be $K$ labels, index $k \in \{1,\dots,K\}$, and confounder vector
+$\mathbf{z}_i \in \mathbb{R}^P$ for individual $i$.
+
+Define target counts:
+
+$$
+\mathbf{x}^{(T)} = \left(x^{(T)}_1, \dots, x^{(T)}_K\right)
+$$
+$$
+N_T = \sum_{k=1}^{K} x^{(T)}_k
+$$
+
+The implementation uses a two-part Bayesian procedure.
+
+1) Uncorrected target prevalence (Dirichlet model)
+
+$$
+\mathbf{p}^{(T)} \sim \mathrm{Dirichlet}\left(\mathbf{x}^{(T)} + \mathbf{1}\right)
+$$
+
+This yields posterior draws $p^{(T)}_{k,s}$ for each label $k$ and posterior sample index $s$.
+
+2) Confounder-corrected expected prevalence (multinomial regression)
+
+The reference data are modeled with a multinomial GLM (via Bambi):
+
+$$
+\Pr\left(y_i = k \mid \mathbf{z}_i\right) = \pi_k\left(\mathbf{z}_i\right)
+$$
+$$
+\mathbf{\pi}(\mathbf{z}_i) = \mathrm{softmax}\left(\eta_1(\mathbf{z}_i), \dots, \eta_K(\mathbf{z}_i)\right)
+$$
+
+Where $y_i \in \{1, \dots, K\}$ denotes the observed class label for the $i$-th observation, and
+$\mathbf{z}_i$ is the vector of associated confounders. In the Bambi formula $c(\mathrm{labels}) \sim$
+confounders, the `labels` column in the data frame corresponds to the collection of observed $y_i$ values.
+
+With linear predictors $\eta_k(\mathbf{z}_i)$ parameterized by the confounders.
+
+For each posterior draw $s$, predicted response probabilities are computed for all target individuals and averaged:
+
+$$
+\hat{p}^{(R\to T)}_{k,s} = \frac{1}{n_T} \sum_{i=1}^{n_T} \pi_{k,s}\left(\mathbf{z}^{(T)}_i\right)
+$$
+
+where $\hat{p}^{(R\to T)}_{k,s}$ is the prevalence expected in the target cohort under the reference-derived model.
+
+CorProDir then reports draw-wise contrasts:
+
+$$
+\Delta_{k,s} = p^{(T)}_{k,s} - \hat{p}^{(R\to T)}_{k,s}
+$$
+$$
+R_{k,s} = \log_2\left(\frac{p^{(T)}_{k,s}}{\hat{p}^{(R\to T)}_{k,s}}\right)
+$$
+
+and summarizes them per label with posterior means, standard deviations, HDIs, and posterior sign probabilities
+$f_k^+ = \Pr(\Delta_k > 0)$ and $f_k^- = \Pr(\Delta_k < 0)$ estimated from sampled draws.
+
 ## Key Features
 
 - Accounts for covariates (e.g., age, BMI) when comparing proportions between populations
@@ -53,7 +115,6 @@ def build_data():
         target_df[label] = target_df["label"].apply(lambda x: 1 if x == label else 0)
 
     return ref_df, target_df
-
 
 if __name__ == "__main__":
     ref_df, target_df = build_data()
