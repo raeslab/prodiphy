@@ -29,8 +29,10 @@ $$
 $$
 
 $$
-\boldsymbol{\mu}_c \sim \mathcal{N}(\mathbf{0}, \mu_{\text{prior\_std}}^2 I_D)
+\boldsymbol{\mu}_c \sim \mathcal{N}(\mathbf{0}, \sigma_\mu^2 I_D)
 $$
+
+where $\sigma_\mu$ is the prior scale for cluster means (set by the mean-prior standard deviation argument in `fit`).
 
 $$
 \Sigma_c = L_c L_c^\top,
@@ -39,8 +41,22 @@ $$
 where $L_c$ is sampled via an LKJ-Cholesky covariance prior:
 
 $$
-L_c \sim \mathrm{LKJCholeskyCov}(\eta, \mathrm{HalfNormal}(\text{sd})).
+L_c \sim \mathrm{LKJCholeskyCov}(\eta, \mathrm{HalfNormal}(\sigma_s)).
 $$
+
+More explicitly, this prior decomposes covariance into marginal scales and correlations,
+
+$$
+\Sigma_c = \mathrm{diag}(\mathbf{s}_c)\,R_c\,\mathrm{diag}(\mathbf{s}_c),
+$$
+
+with
+
+$$
+R_c \sim \mathrm{LKJ}(\eta), \qquad s_{cd} \sim \mathrm{HalfNormal}(\sigma_s),\ d=1,\dots,D.
+$$
+
+Here, $\eta$ controls how strongly correlations are shrunk toward zero (larger $\eta$ implies stronger concentration around the identity correlation matrix), and $\sigma_s$ is set by the scale argument in `fit`.
 
 Conditioned on the parameters, each observation follows a Gaussian mixture likelihood:
 
