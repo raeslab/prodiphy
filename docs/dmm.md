@@ -27,7 +27,12 @@ $$
 and each mixture component $c \in \{1,\dots,C\}$ has:
 
 - mixture weight $w_c$,
-- category proportions $\mathbf{p}_c = (p_{c1},\dots,p_{cK})$ with $\sum_k p_{ck}=1$,
+- category proportions:
+
+$$
+\mathbf{p}_c = (p_{c1},\dots,p_{cK}), \quad \sum_{k=1}^{K} p_{ck}=1
+$$
+
 - concentration (overdispersion) parameter $\alpha_c > 0$.
 
 The priors used by the model are:
@@ -63,7 +68,11 @@ $$
 p(\mathbf{x}_i \mid \Theta) = \sum_{c=1}^{C} w_c\,\mathrm{DM}(\mathbf{x}_i \mid n, \mathbf{a}_c)
 $$
 
-with $\Theta = \{\mathbf{w},\mathbf{p}_{1:C},\alpha_{1:C}\}$.
+with parameter set
+
+$$
+\Theta = \{\mathbf{w},\mathbf{p}_{1:C},\alpha_{1:C}\}.
+$$
 
 After posterior sampling, cluster assignment for each sample is obtained from posterior predictive draws of
 the latent categorical index:
