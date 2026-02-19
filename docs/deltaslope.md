@@ -5,6 +5,65 @@ the slope of the regression, the intercept and the spread. The example code belo
 one for each group, and how to run the model specifying columns for the features corresponding to the x and y axes.
 
 
+## Mathematical formulation
+
+Let observations be indexed by $i = 1, \dots, n$, with predictor $x_i$, response $y_i$, and group indicator
+$g_i \in \{0,1\}$ where $g_i=0$ denotes the reference group and $g_i=1$ the target group.
+
+The model used in the implementation is
+
+$$
+y_i \sim \mathrm{Normal}(\mu_i, \sigma_{g_i})
+$$
+$$
+\mu_i = \left(\beta_{\mathrm{ref}} + \Delta_\beta g_i\right)x_i + \alpha_{g_i}
+$$
+
+with priors
+
+$$
+\beta_{\mathrm{ref}} \sim \mathrm{Normal}(0, 2)
+$$
+$$
+\Delta_\beta \sim \mathrm{Normal}(0, 1)
+$$
+$$
+\alpha_0, \alpha_1 \sim \mathrm{Normal}(0, 2)
+$$
+$$
+\sigma_0, \sigma_1 \sim \mathrm{Normal}(1, 1)
+$$
+
+From these parameters, DeltaSlope defines derived quantities reported in the summary:
+
+$$
+\beta_{\mathrm{target}} = \beta_{\mathrm{ref}} + \Delta_\beta
+$$
+$$
+\Delta_\alpha = \alpha_1 - \alpha_0
+$$
+$$
+\Delta_\sigma = \sigma_1 - \sigma_0
+$$
+
+and
+
+$$
+\alpha_{\mathrm{ref}} = \alpha_0
+$$
+$$
+\alpha_{\mathrm{target}} = \alpha_1
+$$
+$$
+\sigma_{\mathrm{ref}} = \sigma_0
+$$
+$$
+\sigma_{\mathrm{target}} = \sigma_1
+$$
+
+Inference is performed by sampling from the posterior using PyMC's sampler and reporting posterior summaries
+(mean, SD, and HDI intervals) for these reference, target, and delta parameters.
+
 ## Example Usage
 
 ```python
