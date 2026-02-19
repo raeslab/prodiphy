@@ -40,8 +40,11 @@ $$
 \mathbf{\pi}(\mathbf{z}_i) = \mathrm{softmax}\left(\eta_1(\mathbf{z}_i), \dots, \eta_K(\mathbf{z}_i)\right)
 $$
 
-with linear predictors $\eta_k(\mathbf{z}_i)$ parameterized by the confounders in the formula
-$c(\mathrm{labels}) \sim$ confounders.
+Where $y_i \in \{1, \dots, K\}$ denotes the observed class label for the $i$-th observation, and
+$\mathbf{z}_i$ is the vector of associated confounders. In the Bambi formula $c(\mathrm{labels}) \sim$
+confounders, the `labels` column in the data frame corresponds to the collection of observed $y_i$ values.
+
+With linear predictors $\eta_k(\mathbf{z}_i)$ parameterized by the confounders.
 
 For each posterior draw $s$, predicted response probabilities are computed for all target individuals and averaged:
 
@@ -112,7 +115,6 @@ def build_data():
         target_df[label] = target_df["label"].apply(lambda x: 1 if x == label else 0)
 
     return ref_df, target_df
-
 
 if __name__ == "__main__":
     ref_df, target_df = build_data()
