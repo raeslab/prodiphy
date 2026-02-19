@@ -7,44 +7,44 @@ prevalence of that species in the polluted vs unpolluted ecosystem.
 
 ## Mathematical formulation
 
-Assume there are \(K\) classes and two groups \(g \in \{1,2\}\). Let
-\(\mathbf{x}_g = (x_{g1}, \dots, x_{gK})\) be the observed class counts in group \(g\), with
-\(N_g = \sum_{k=1}^{K} x_{gk}\). The latent class-prevalence vector for group \(g\) is
-\(\mathbf{p}_g = (p_{g1}, \dots, p_{gK})\), where \(\sum_k p_{gk} = 1\).
+Assume there are $K$ classes and two groups $g \in \{1,2\}$. Let
+$\mathbf{x}_g = (x_{g1}, \dots, x_{gK})$ be the observed class counts in group $g$, with
+$N_g = \sum_{k=1}^{K} x_{gk}$. The latent class-prevalence vector for group $g$ is
+$\mathbf{p}_g = (p_{g1}, \dots, p_{gK})$, where $\sum_k p_{gk} = 1$.
 
 Using a symmetric Dirichlet prior and a multinomial observation model:
 
-\[
+$$
 \mathbf{p}_g \sim \operatorname{Dirichlet}(\mathbf{1}),
 \qquad
 \mathbf{x}_g \mid \mathbf{p}_g \sim \operatorname{Multinomial}(N_g, \mathbf{p}_g).
-\]
+$$
 
 By Dirichlet--multinomial conjugacy, the posterior is:
 
-\[
+$$
 \mathbf{p}_g \mid \mathbf{x}_g \sim
 \operatorname{Dirichlet}(\mathbf{x}_g + \mathbf{1}).
-\]
+$$
 
 This is exactly what the implementation samples from via:
 
-\[
+$$
 \mathbf{p}_1 \sim \operatorname{Dirichlet}(\mathbf{x}_1 + \mathbf{1}),
 \qquad
 \mathbf{p}_2 \sim \operatorname{Dirichlet}(\mathbf{x}_2 + \mathbf{1}).
-\]
+$$
 
-For each class \(k\), ProDir reports posterior draws of two effect-size quantities:
+For each class $k$, ProDir reports posterior draws of two effect-size quantities:
 
-\[
+$$
 \Delta_k = p_{1k} - p_{2k},
 \qquad
 R_k = \log_2\left(\frac{p_{2k}}{p_{1k}}\right).
-\]
+$$
 
 Inference is performed by Monte Carlo sampling from the posterior; summary statistics (mean, SD, and HDI intervals)
-for \(\Delta_k\), \(R_k\), and each \(p_{gk}\) are returned.
+for $\Delta_k$, $R_k$, and each $p_{gk}$ are returned.
 
 ## Example Usage
 
