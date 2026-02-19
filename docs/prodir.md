@@ -15,24 +15,24 @@ $\mathbf{p}_g = (p_{g1}, \dots, p_{gK})$, where $\sum_k p_{gk} = 1$.
 Using a symmetric Dirichlet prior and a multinomial observation model:
 
 $$
-\mathbf{p}_g \sim \operatorname{Dirichlet}(\mathbf{1}),
+\mathbf{p}_g \sim \mathrm{Dirichlet}(\mathbf{1}),
 \qquad
-\mathbf{x}_g \mid \mathbf{p}_g \sim \operatorname{Multinomial}(N_g, \mathbf{p}_g).
+\mathbf{x}_g \mid \mathbf{p}_g \sim \mathrm{Multinomial}(N_g, \mathbf{p}_g).
 $$
 
 By Dirichlet--multinomial conjugacy, the posterior is:
 
 $$
 \mathbf{p}_g \mid \mathbf{x}_g \sim
-\operatorname{Dirichlet}(\mathbf{x}_g + \mathbf{1}).
+\mathrm{Dirichlet}(\mathbf{x}_g + \mathbf{1}).
 $$
 
 This is exactly what the implementation samples from via:
 
 $$
-\mathbf{p}_1 \sim \operatorname{Dirichlet}(\mathbf{x}_1 + \mathbf{1}),
+\mathbf{p}_1 \sim \mathrm{Dirichlet}(\mathbf{x}_1 + \mathbf{1}),
 \qquad
-\mathbf{p}_2 \sim \operatorname{Dirichlet}(\mathbf{x}_2 + \mathbf{1}).
+\mathbf{p}_2 \sim \mathrm{Dirichlet}(\mathbf{x}_2 + \mathbf{1}).
 $$
 
 For each class $k$, ProDir reports posterior draws of two effect-size quantities:
