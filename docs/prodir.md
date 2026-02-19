@@ -5,6 +5,47 @@ a similar ecosystem, one exposed to a pollutant and the other not. Counts, how m
 observed can be provided to the model, and the results will show if the model is confident there is a difference in 
 prevalence of that species in the polluted vs unpolluted ecosystem.
 
+## Mathematical formulation
+
+Assume there are \(K\) classes and two groups \(g \in \{1,2\}\). Let
+\(\mathbf{x}_g = (x_{g1}, \dots, x_{gK})\) be the observed class counts in group \(g\), with
+\(N_g = \sum_{k=1}^{K} x_{gk}\). The latent class-prevalence vector for group \(g\) is
+\(\mathbf{p}_g = (p_{g1}, \dots, p_{gK})\), where \(\sum_k p_{gk} = 1\).
+
+Using a symmetric Dirichlet prior and a multinomial observation model:
+
+\[
+\mathbf{p}_g \sim \operatorname{Dirichlet}(\mathbf{1}),
+\qquad
+\mathbf{x}_g \mid \mathbf{p}_g \sim \operatorname{Multinomial}(N_g, \mathbf{p}_g).
+\]
+
+By Dirichlet--multinomial conjugacy, the posterior is:
+
+\[
+\mathbf{p}_g \mid \mathbf{x}_g \sim
+\operatorname{Dirichlet}(\mathbf{x}_g + \mathbf{1}).
+\]
+
+This is exactly what the implementation samples from via:
+
+\[
+\mathbf{p}_1 \sim \operatorname{Dirichlet}(\mathbf{x}_1 + \mathbf{1}),
+\qquad
+\mathbf{p}_2 \sim \operatorname{Dirichlet}(\mathbf{x}_2 + \mathbf{1}).
+\]
+
+For each class \(k\), ProDir reports posterior draws of two effect-size quantities:
+
+\[
+\Delta_k = p_{1k} - p_{2k},
+\qquad
+R_k = \log_2\left(\frac{p_{2k}}{p_{1k}}\right).
+\]
+
+Inference is performed by Monte Carlo sampling from the posterior; summary statistics (mean, SD, and HDI intervals)
+for \(\Delta_k\), \(R_k\), and each \(p_{gk}\) are returned.
+
 ## Example Usage
 
 ```python
@@ -49,4 +90,3 @@ E.g. here the prevalence of Species C is confidently decreased as the HDI on `lo
 | group_1_p_SpeciesD  |  0.067 | 0.019 |    0.031 |     0.102 |       0     |     0     |       4462 |       2855 |       1 |
 | group_2_p_SpeciesD  |  0.085 | 0.025 |    0.041 |     0.132 |       0     |     0     |       5259 |       2906 |       1 |
 | log2_ratio_SpeciesD |  0.344 | 0.618 |   -0.79  |     1.523 |       0.009 |     0.008 |       4506 |       3332 |       1 |
-
