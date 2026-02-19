@@ -2,6 +2,80 @@
 
 A Gaussian Multivariate Mixture (GMvM) model is a probabilistic approach for clustering continuous multivariate data by modeling the data as a mixture of multivariate Gaussian distributions. Each cluster is characterized by its own mean vector and covariance matrix, allowing the model to capture different shapes, orientations, and sizes of clusters in the multivariate space. This makes it particularly useful for analyzing complex datasets where clusters may have different characteristics.
 
+## Mathematical formulation
+
+Assume there are $N$ observations, each with $D$ continuous features, and a fixed number of latent clusters $C$.
+Define the observed vectors as
+
+$$
+\mathbf{x}_i \in \mathbb{R}^D, \quad i \in \{1,\dots,N\}
+$$
+
+with mixture parameters
+
+$$
+\mathbf{w} = (w_1,\dots,w_C), \quad \sum_{c=1}^C w_c = 1,
+$$
+
+$$
+\boldsymbol{\mu}_c \in \mathbb{R}^D, \quad
+\Sigma_c \in \mathbb{R}^{D \times D}, \quad \Sigma_c \succ 0.
+$$
+
+The implementation in `GMvM.fit()` uses the following priors for each component $c$:
+
+$$
+\mathbf{w} \sim \mathrm{Dirichlet}\left(\frac{1}{C}\mathbf{1}_C\right)
+$$
+
+$$
+\boldsymbol{\mu}_c \sim \mathcal{N}(\mathbf{0}, \mu_{\text{prior\_std}}^2 I_D)
+$$
+
+$$
+\Sigma_c = L_c L_c^\top,
+$$
+
+where $L_c$ is sampled via an LKJ-Cholesky covariance prior:
+
+$$
+L_c \sim \mathrm{LKJCholeskyCov}(\eta, \mathrm{HalfNormal}(\text{sd})).
+$$
+
+Conditioned on the parameters, each observation follows a Gaussian mixture likelihood:
+
+$$
+p(\mathbf{x}_i \mid \Theta) = \sum_{c=1}^C w_c\,\mathcal{N}(\mathbf{x}_i \mid \boldsymbol{\mu}_c, \Sigma_c),
+$$
+
+with
+
+$$
+\Theta = \{\mathbf{w}, (\boldsymbol{\mu}_c, \Sigma_c)_{c=1}^C\}.
+$$
+
+Inference is performed by MCMC sampling (`pm.sample`) and point summaries are reported with ArviZ (`az.summary`).
+
+For cluster assignment in `get_clusters()`, the implementation evaluates per-observation component logits
+
+$$
+\log \pi_{ic} = \log w_c + \log \mathcal{N}(\mathbf{x}_i \mid \boldsymbol{\mu}_c, \Sigma_c),
+$$
+
+then samples a latent categorical index
+
+$$
+z_i \sim \mathrm{Categorical}(\mathrm{softmax}(\log \pi_{i1},\dots,\log \pi_{iC})).
+$$
+
+Posterior predictive draws of $z_i$ are converted to empirical assignment probabilities,
+
+$$
+\hat p_{ic} = \Pr(z_i = c \mid \mathbf{x}_i, \text{posterior draws}),
+$$
+
+and the reported cluster is $\arg\max_c \hat p_{ic}$.
+
 ## Example Usage
 
 The GMvM class can be used to fit a Gaussian Multivariate Mixture model to a dataset and determine the optimal number of clusters. A single GMvM model can also be used to fit a specific number of clusters and then assign data points to one of those clusters.
