@@ -17,9 +17,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "pymc>=5.16.2",
-    "bambi>=0.14.1",
-    "arviz>=0.19.0",
+    "pymc>=5.16.2,<6.0.0",
+    "bambi>=0.14.1,<0.18.0",
+    "arviz>=0.19.0,<1.0.0",
     "numpy>=1.26.4",
     "pandas>=2.2.2",
     "tabulate>=0.9.0",
