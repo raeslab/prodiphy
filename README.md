@@ -60,6 +60,7 @@ available:
   * [DeltaSlope](./docs/deltaslope.md): Model to compare the slope, intercept and spread of a linear regression between two groups.
   * [DMM](./docs/dmm.md): Dirichlet Multinomial Mixture model to detect clusters with different prevalence of classes.
   * [GMvM](./docs/gmvm.md): Gaussian Multivariate Mixture model for clustering continuous multivariate data.
+  * [ACORN](./docs/acorn.md): Adjusted CORrelations, Negative-binomial. Hierarchical model testing whether every feature in a count table is associated with a continuous marker, adjusted for covariates.
 
 
 ## Contributing

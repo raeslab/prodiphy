@@ -4,13 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ProDiphy is a Python package that implements probabilistic models to compare (sub-)populations using Bayesian statistics. It provides five main models:
+ProDiphy is a Python package that implements probabilistic models to compare (sub-)populations using Bayesian statistics. It provides six main models:
 
 - **ProDir**: Compare prevalence of specific classes in two populations using Dirichlet distributions
 - **CorProDir**: ProDir model with covariate correction using Bambi/hierarchical modeling
 - **DeltaSlope**: Compare slope, intercept and spread of linear regressions between two groups
 - **DMM**: Dirichlet Multinomial Mixture model to detect clusters with different prevalence patterns
 - **GMvM**: Gaussian Multivariate Mixture model for clustering continuous multivariate data
+- **ACORN**: Adjusted CORrelations, Negative-binomial; hierarchical NB model relating every feature in a count table to a continuous marker, adjusted for covariates
 
 ## Configuration
 
@@ -106,6 +107,14 @@ All models follow a consistent pattern:
 - Uses separate covariance matrices per cluster with LKJ priors
 - Output: Cluster assignments with probabilities and model parameters
 - Includes model comparison functionality for optimal cluster selection
+
+**ACORN** (`acorn.py`): Adjusted CORrelations, Negative-binomial; hierarchical NB correlation model
+- Input: Wide DataFrame (one row per sample) with feature count columns, a continuous marker column, and covariate columns
+- Fits all features jointly; each per-feature coefficient is non-centered and partially pooled (principled alternative to per-feature GLM + FDR)
+- Covariates are explicit `(column, encoding)` specs: `"continuous"` (z-scored) or a `{value: 0/1}` dict (binary); multi-level categoricals are rejected
+- Inference via `method="nuts"` (default `nuts_sampler="pymc"`; pass `"numpyro"` if installed) or `method="advi"`/`"fullrank_advi"` for fast previews
+- Optional `log(total)` offset for non-depth-normalized tables and optional hierarchical pooling of the dispersion
+- `get_stats()` returns the ranked association table (log_effect, HDI, fold_change, prob_direction, prob_outside_rope, hdi_excludes_zero); `get_summary()` returns a raw ArviZ summary
 
 ## Development Guidelines
 
