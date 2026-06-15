@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 import pytest
 
 from prodiphy import CorProDir
@@ -91,7 +91,6 @@ def test_init_custom():
     assert model.draws == 500
 
 
-# @pytest.mark.skip(reason="Temporarily disabled to speed up testing of other components")
 def test_corprodir(sample_data):
     """
     Test the CorProDir class with sample data.
@@ -139,7 +138,7 @@ def test_corprodir(sample_data):
         assert col in stats_df.columns
 
 
-def test_corprodir(sample_data_large):
+def test_corprodir_large(sample_data_large):
     """
     Test the CorProDir class with sample data large.
 

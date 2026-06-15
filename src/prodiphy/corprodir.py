@@ -1,12 +1,11 @@
-import pymc as pm
+import arviz as az
 import bambi as bmb
 import numpy as np
 import pandas as pd
-import arviz as az
+import pymc as pm
 
 
 class CorProDir:
-
     def __init__(self, chains=4, cores=4, draws=1000):
         """
         Initializes the ProDir class with the number of chains and cores.
@@ -37,7 +36,9 @@ class CorProDir:
         :param labels: List of unique labels.
         """
         for label in labels:
-            df[label] = df[category].apply(lambda x: 1 if x == label else 0)
+            df[label] = df[category].apply(
+                lambda x, label=label: 1 if x == label else 0
+            )
         return df
 
     def _get_final_data(self):

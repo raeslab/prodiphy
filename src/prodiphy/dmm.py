@@ -1,9 +1,9 @@
-import pymc as pm
-import pandas as pd
-import numpy as np
-import arviz as az
-
 from typing import Literal
+
+import arviz as az
+import numpy as np
+import pandas as pd
+import pymc as pm
 
 
 class DMM:
@@ -96,7 +96,7 @@ class DMM:
                 n_reads, n_features, priors, weights, conc_bounds=(lower, upper)
             )
 
-            obs = pm.Mixture("obs", w=w, comp_dists=components, observed=data)
+            pm.Mixture("obs", w=w, comp_dists=components, observed=data)
 
             self.trace = pm.sample(
                 self.samples,
@@ -127,7 +127,7 @@ class DMM:
 
         n_reads, n_features, priors, weights = self._prepare_data(data, None, None)
 
-        with pm.Model() as recovery_model:
+        with pm.Model():
             _, w, p, conc, components = self._build_model_components(
                 n_reads, n_features, priors, weights, conc_bounds=(0, 1000)
             )

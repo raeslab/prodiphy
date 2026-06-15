@@ -15,8 +15,9 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
-	// Uncomment the next line to run commands after the container is created.
-	// "postCreateCommand": "cat /etc/os-release",
+	// Re-link the editable prodiphy install against the live-mounted workspace
+	// (the Dockerfile pre-installs dependencies against a build-time copy of src/).
+	"postCreateCommand": "pip install -e '.[dev]'",
 
 	// Configure tool-specific properties.
 	// "customizations": {},

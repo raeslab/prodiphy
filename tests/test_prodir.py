@@ -1,6 +1,6 @@
-import arviz as az
-import pytest
 import os
+
+import pytest
 
 from prodiphy import ProDir
 
@@ -24,28 +24,28 @@ def test_prodir():
     summary_df = model.get_stats()
 
     # Check that 'delta' and 'log2_ratio' variables are present in the summary for each label
-    for l in sub_group_labels:
-        assert f"delta_{l}" in summary_df.index
-        assert f"log2_ratio_{l}" in summary_df.index
+    for label in sub_group_labels:
+        assert f"delta_{label}" in summary_df.index
+        assert f"log2_ratio_{label}" in summary_df.index
 
     # Check that the proportions in group_1 match the expected values
-    for v, l in zip(group_1_counts, sub_group_labels):
+    for v, label in zip(group_1_counts, sub_group_labels, strict=True):
         proportion_obs = v / sum(group_1_counts)
-        assert f"group_1_p_{l}" in summary_df.index
-        assert summary_df.loc[f"group_1_p_{l}", "mean"] == pytest.approx(
+        assert f"group_1_p_{label}" in summary_df.index
+        assert summary_df.loc[f"group_1_p_{label}", "mean"] == pytest.approx(
             proportion_obs, rel=1e-1
         )
 
     # Check that the proportions in group_2 match the expected values
-    for v, l in zip(group_2_counts, sub_group_labels):
+    for v, label in zip(group_2_counts, sub_group_labels, strict=True):
         proportion_obs = v / sum(group_2_counts)
-        assert f"group_2_p_{l}" in summary_df.index
-        assert summary_df.loc[f"group_2_p_{l}", "mean"] == pytest.approx(
+        assert f"group_2_p_{label}" in summary_df.index
+        assert summary_df.loc[f"group_2_p_{label}", "mean"] == pytest.approx(
             proportion_obs, rel=1e-1
         )
 
     # Ensure an exception is raised if input lists have different lengths
-    with pytest.raises(Exception):
+    with pytest.raises(AssertionError):
         model.fit(group_1_counts, group_2_counts, sub_group_labels[2:], verbose=True)
-    with pytest.raises(Exception):
+    with pytest.raises(AssertionError):
         model.fit(group_1_counts, group_2_counts[2:], sub_group_labels, verbose=True)

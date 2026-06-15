@@ -1,6 +1,6 @@
+import arviz as az
 import pandas as pd
 import pymc as pm
-import arviz as az
 
 
 def _combine_dataframes(df1: pd.DataFrame, df2: pd.DataFrame):
@@ -44,19 +44,17 @@ class DeltaSlope:
 
             intercepts = pm.Normal("intercepts", 0, 2, shape=2)
 
-            delta_intercept = pm.Deterministic(
-                "delta_intercept", intercepts[1] - intercepts[0]
-            )
-            delta_sigma = pm.Deterministic("delta_sigma", sigmas[1] - sigmas[0])
+            pm.Deterministic("delta_intercept", intercepts[1] - intercepts[0])
+            pm.Deterministic("delta_sigma", sigmas[1] - sigmas[0])
 
-            ref_intercept = pm.Deterministic("ref_intercept", intercepts[0])
-            ref_sigma = pm.Deterministic("ref_sigma", sigmas[0])
+            pm.Deterministic("ref_intercept", intercepts[0])
+            pm.Deterministic("ref_sigma", sigmas[0])
 
-            target_slope = pm.Deterministic("target_slope", ref_slope + delta_slope)
-            target_intercept = pm.Deterministic("target_intercept", intercepts[1])
-            target_sigma = pm.Deterministic("target_sigma", sigmas[1])
+            pm.Deterministic("target_slope", ref_slope + delta_slope)
+            pm.Deterministic("target_intercept", intercepts[1])
+            pm.Deterministic("target_sigma", sigmas[1])
 
-            y_obs = pm.Normal(
+            pm.Normal(
                 "y_obs",
                 (ref_slope + (delta_slope * group)) * x + intercepts[group],
                 sigmas[group],
@@ -68,7 +66,7 @@ class DeltaSlope:
                 tune=self.tune,
                 chains=self.chains,
                 cores=self.cores,
-                **sample_kwargs
+                **sample_kwargs,
             )
 
     def get_stats(self):

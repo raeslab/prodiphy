@@ -1,10 +1,10 @@
-import pymc as pm
-import pandas as pd
-import numpy as np
-import arviz as az
-import pytensor.tensor as pt
-
 from typing import Literal
+
+import arviz as az
+import numpy as np
+import pandas as pd
+import pymc as pm
+import pytensor.tensor as pt
 
 
 class GMvM:
@@ -50,7 +50,9 @@ class GMvM:
         n_observations, n_features = data_array.shape
 
         if n_observations < self.clusters:
-            raise ValueError("Number of observations must be greater than number of clusters.")
+            raise ValueError(
+                "Number of observations must be greater than number of clusters."
+            )
 
         return data_array, n_observations, n_features
 
@@ -97,7 +99,7 @@ class GMvM:
                 mus.append(mu_k)
 
             # Create the multivariate normal distribution for each cluster
-            MultivariateNormals = [
+            multivariate_normals = [
                 pm.MvNormal.dist(mus[k], chol=chols[k], shape=n_features)
                 for k in range(self.clusters)
             ]
@@ -105,7 +107,9 @@ class GMvM:
             # Create the weights for each cluster
             w = pm.Dirichlet("w", np.ones(self.clusters) / self.clusters)
 
-            self.obs = pm.Mixture("obs", w=w, comp_dists=MultivariateNormals, observed=data_array)
+            self.obs = pm.Mixture(
+                "obs", w=w, comp_dists=multivariate_normals, observed=data_array
+            )
 
             self.trace = pm.sample(
                 self.samples,

@@ -1,7 +1,8 @@
-import pytest
+from random import shuffle
+
 import numpy as np
 import pandas as pd
-from random import shuffle
+import pytest
 from scipy.stats import dirichlet
 
 from prodiphy import DMM
@@ -21,8 +22,8 @@ def sample_data():
 
     sample_counts = [100, 100, 200]
 
-    for sample_count, alpha in zip(sample_counts, alphas):
-        for j in range(sample_count):
+    for sample_count, alpha in zip(sample_counts, alphas, strict=True):
+        for _ in range(sample_count):
             pvals = dirichlet.rvs(alpha, size=1)[0]
             data.append(np.random.multinomial(1000, pvals))
 

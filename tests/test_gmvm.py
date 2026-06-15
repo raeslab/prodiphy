@@ -1,6 +1,6 @@
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
 
 from prodiphy import GMvM
 
@@ -26,10 +26,10 @@ def sample_data():
     cluster3 = np.random.multivariate_normal([-2, 2], [[0.8, 0], [0, 0.8]], 100)
 
     # Combine all clusters
-    X = np.vstack([cluster1, cluster2, cluster3])
+    x = np.vstack([cluster1, cluster2, cluster3])
 
     # Convert to DataFrame
-    df = pd.DataFrame(X, columns=['feature_1', 'feature_2'])
+    df = pd.DataFrame(x, columns=["feature_1", "feature_2"])
     return df
 
 
@@ -48,27 +48,29 @@ def high_dim_data():
     cluster1 = np.random.multivariate_normal(
         [0, 0, 0, 0],
         [[0.6, 0, 0, 0], [0, 0.6, 0, 0], [0, 0, 0.6, 0], [0, 0, 0, 0.6]],
-        50
+        50,
     )
 
     # Cluster 2: centered at [2, 2, 2, 2]
     cluster2 = np.random.multivariate_normal(
         [2, 2, 2, 2],
         [[0.6, 0, 0, 0], [0, 0.6, 0, 0], [0, 0, 0.6, 0], [0, 0, 0, 0.6]],
-        50
+        50,
     )
 
     # Cluster 3: centered at [-1, 1, -1, 1]
     cluster3 = np.random.multivariate_normal(
         [-1, 1, -1, 1],
         [[0.6, 0, 0, 0], [0, 0.6, 0, 0], [0, 0, 0.6, 0], [0, 0, 0, 0.6]],
-        50
+        50,
     )
 
     # Combine all clusters
-    X = np.vstack([cluster1, cluster2, cluster3])
+    x = np.vstack([cluster1, cluster2, cluster3])
 
-    df = pd.DataFrame(X, columns=['bill_length', 'bill_depth', 'flipper_length', 'body_mass'])
+    df = pd.DataFrame(
+        x, columns=["bill_length", "bill_depth", "flipper_length", "body_mass"]
+    )
     return df
 
 
@@ -203,7 +205,7 @@ def test_fit_with_insufficient_observations():
     Test fitting the GMvM model with fewer observations than clusters.
     """
     # Create data with only 2 observations but 3 clusters
-    small_data = pd.DataFrame([[1, 2], [3, 4]], columns=['x', 'y'])
+    small_data = pd.DataFrame([[1, 2], [3, 4]], columns=["x", "y"])
     model = GMvM(clusters=3, chains=1, cores=1, samples=50, tune=50)
     with pytest.raises(ValueError):
         model.fit(small_data)
@@ -266,7 +268,9 @@ def test_get_clusters_with_different_data(sample_model):
     Test get_clusters method with different data than what was used for fitting.
     """
     # Create new test data
-    new_data = pd.DataFrame([[0, 0], [3, 3], [-2, 2]], columns=['feature_1', 'feature_2'])
+    new_data = pd.DataFrame(
+        [[0, 0], [3, 3], [-2, 2]], columns=["feature_1", "feature_2"]
+    )
     cluster_df = sample_model.get_clusters(new_data)
     assert isinstance(cluster_df, pd.DataFrame)
     assert cluster_df.shape[0] == new_data.shape[0]
@@ -277,12 +281,7 @@ def test_determine_best_cluster_count(sample_data):
     Test determine_best_cluster_count method with default parameters.
     """
     comps = GMvM.determine_best_cluster_count(
-        sample_data,
-        cluster_sizes=[2, 3],
-        samples=50,
-        tune=50,
-        chains=1,
-        cores=1
+        sample_data, cluster_sizes=[2, 3], samples=50, tune=50, chains=1, cores=1
     )
     assert isinstance(comps, pd.DataFrame)
     assert comps.shape[0] == 2
@@ -302,7 +301,7 @@ def test_determine_best_cluster_count_with_loo(sample_data):
         tune=50,
         chains=1,
         cores=1,
-        ic="loo"
+        ic="loo",
     )
     assert isinstance(comps, pd.DataFrame)
     assert comps.shape[0] == 2
@@ -324,7 +323,7 @@ def test_determine_best_cluster_count_with_custom_priors(sample_data):
         cores=1,
         eta=3.0,
         sd=0.5,
-        mu_prior_std=2.0
+        mu_prior_std=2.0,
     )
     assert isinstance(comps, pd.DataFrame)
     assert comps.shape[0] == 2

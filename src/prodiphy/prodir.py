@@ -1,6 +1,6 @@
-import pymc as pm
-import numpy as np
 import arviz as az
+import numpy as np
+import pymc as pm
 
 
 class ProDir:
@@ -79,11 +79,11 @@ class ProDir:
 
         var_names = []
 
-        for l in self.labels:
-            var_names.append(f"delta_{l}")
-            var_names.append(f"group_1_p_{l}")
-            var_names.append(f"group_2_p_{l}")
-            var_names.append(f"log2_ratio_{l}")
+        for label in self.labels:
+            var_names.append(f"delta_{label}")
+            var_names.append(f"group_1_p_{label}")
+            var_names.append(f"group_2_p_{label}")
+            var_names.append(f"log2_ratio_{label}")
 
         summary_df = az.summary(self.trace, var_names=var_names)
 

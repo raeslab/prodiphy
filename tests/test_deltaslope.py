@@ -1,8 +1,8 @@
-import arviz as az
-import pytest
 import os
+
 import numpy as np
 import pandas as pd
+import pytest
 
 from prodiphy import DeltaSlope
 
