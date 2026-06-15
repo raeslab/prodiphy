@@ -21,7 +21,7 @@ point estimate + p-value.
 ## Mathematical formulation
 
 The data is reshaped to long format: one row per `(sample, feature)` pair. For row $i$
-belonging to feature $t = \text{feature\_idx}[i]$:
+belonging to feature $t = \mathrm{feature\_idx}[i]$:
 
 $$
 y_i \sim \mathrm{NegativeBinomial}\!\left(\mu = e^{\eta_i},\; \alpha = \phi_t\right)
