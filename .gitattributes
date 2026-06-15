@@ -1,0 +1,29 @@
+# Auto detect text files and normalize line endings to LF in the repository
+* text=auto eol=lf
+
+# Source code
+*.py text eol=lf diff=python
+
+# Documentation
+*.md text eol=lf
+LICENSE text eol=lf
+
+# Config / CI files
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.cfg text eol=lf
+*.ini text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+Dockerfile text eol=lf
+
+# Binary files - leave untouched
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.pdf binary
