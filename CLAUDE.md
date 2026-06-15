@@ -29,8 +29,13 @@ This project uses modern Python packaging standards with all configuration centr
 # Create conda environment and install package
 conda create -n prodiphy python=3.12
 conda activate prodiphy
-pip install -e .
+pip install -e ".[dev]"  # includes pytest, pytest-cov, pytest-xdist, ruff
 ```
+
+Tests run in parallel by default: `pytest-xdist` is configured in
+`pyproject.toml` (`addopts = "-ra -n auto --dist load"`), so `pytest` fans the
+suite across CPU cores. Pass `-n0` to force serial execution. BLAS threads are
+pinned to 1 in `tests/conftest.py` so the parallel workers don't oversubscribe.
 
 ### Testing
 ```bash

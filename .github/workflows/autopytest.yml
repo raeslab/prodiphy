@@ -28,6 +28,7 @@ jobs:
           pip install .
           pip install pytest
           pip install pytest-cov
+          pip install pytest-xdist
       - name: Run tests
         run: |
           pytest --exitfirst --verbose --failed-first --cov=src tests/ --cov-report=term-missing --cov-report=xml

@@ -5,7 +5,7 @@ import pytest
 from prodiphy import ACORN
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def sample_data():
     """
     Generate a small wide sample x feature table with a planted association.
@@ -43,7 +43,7 @@ def sample_data():
     return df, feature_names
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def fitted_model(sample_data):
     """Fit a small ACORN model (ADVI for speed) on the sample data."""
     df, feature_names = sample_data

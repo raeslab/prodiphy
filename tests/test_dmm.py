@@ -8,7 +8,7 @@ from scipy.stats import dirichlet
 from prodiphy import DMM
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def sample_data():
     """
     Fixture to generate sample data for testing.
@@ -33,7 +33,7 @@ def sample_data():
     return df
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def sample_model(sample_data):
     """
     Fixture to create and fit a DMM model using the sample data.
@@ -182,7 +182,14 @@ def test_determine_best_cluster_count(sample_data):
     """
     Test determine_best_cluster_count method with default parameters.
     """
-    comps = DMM.determine_best_cluster_count(sample_data, cluster_sizes=[3, 4, 5])
+    comps = DMM.determine_best_cluster_count(
+        sample_data,
+        cluster_sizes=[3, 4, 5],
+        samples=50,
+        tune=50,
+        chains=1,
+        cores=1,
+    )
     assert isinstance(comps, pd.DataFrame)
     assert comps.shape[0] == 3
     assert "rank" in comps.columns

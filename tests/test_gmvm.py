@@ -5,7 +5,7 @@ import pytest
 from prodiphy import GMvM
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def sample_data():
     """
     Fixture to generate sample multivariate Gaussian data for testing.
@@ -33,7 +33,7 @@ def sample_data():
     return df
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def high_dim_data():
     """
     Fixture to generate higher-dimensional sample data.
@@ -74,7 +74,7 @@ def high_dim_data():
     return df
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def sample_model(sample_data):
     """
     Fixture to create and fit a GMvM model using the sample data.
