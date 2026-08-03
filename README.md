@@ -31,7 +31,7 @@ pip install -e .
 
 The following code snippet shows how to use the ProDir model to compare two populations. The model is used here to compare 
 the prevalence of species in two ecosystems, one polluted and one unpolluted. The model will estimate the 
-prevalence of each species in both ecosystems and provide a confidence interval for the difference in prevalence.
+prevalence of each species in both ecosystems and provide a credible interval for the difference in prevalence.
 
 ```python
 from prodiphy import ProDir

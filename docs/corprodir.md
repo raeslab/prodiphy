@@ -70,7 +70,7 @@ $f_k^+ = \Pr(\Delta_k > 0)$ and $f_k^- = \Pr(\Delta_k < 0)$ estimated from sampl
 
 - Accounts for covariates (e.g., age, BMI) when comparing proportions between populations
 - Provides estimates of group prevalence differences while controlling for confounding factors
-- Returns confidence intervals (HDI) for the differences and log2 ratios
+- Returns credible intervals (HDI) for the differences and log2 ratios
 - Calculates the fraction of posterior samples above/below zero to assess the reliability of differences
 
 ## Example Usage
