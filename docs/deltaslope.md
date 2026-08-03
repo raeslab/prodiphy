@@ -74,10 +74,10 @@ import numpy as np
 
 def build_dataset():
     x_ref = np.random.randint(0, 100, size=200)
-    y_ref = x_ref * 2 + 10 + np.random.normal(0,2,size=200)
+    y_ref = x_ref * 2 + 10 + np.random.normal(0, 2, size=200)
 
     x_target = np.random.randint(0, 100, size=200)
-    y_target = x_target * 1.5 + 9 + np.random.normal(0,3,size=200)
+    y_target = x_target * 1.5 + 9 + np.random.normal(0, 3, size=200)
 
     ref_df = pd.DataFrame({"x": x_ref, "y": y_ref})
     target_df = pd.DataFrame({"x": x_target, "y": y_target})

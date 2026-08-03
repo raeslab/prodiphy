@@ -84,6 +84,8 @@ from prodiphy import CorProDir
 np.random.seed(1910)
 
 labels = ["a", "b", "c", "d"]
+
+
 def build_data():
 
     ref_size = 800
@@ -115,6 +117,7 @@ def build_data():
         target_df[label] = target_df["label"].apply(lambda x: 1 if x == label else 0)
 
     return ref_df, target_df
+
 
 if __name__ == "__main__":
     ref_df, target_df = build_data()

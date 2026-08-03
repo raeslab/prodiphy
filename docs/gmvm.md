@@ -114,37 +114,45 @@ if __name__ == "__main__":
     # Species 1: Adelie (smaller, shorter bills)
     adelie = np.random.multivariate_normal(
         mean=[39.0, 18.5, 190.0, 3700.0],
-        cov=[[3.0, 0.2, 5.0, 200.0],
-             [0.2, 1.0, 2.0, 100.0],
-             [5.0, 2.0, 30.0, 500.0],
-             [200.0, 100.0, 500.0, 50000.0]],
-        size=50
+        cov=[
+            [3.0, 0.2, 5.0, 200.0],
+            [0.2, 1.0, 2.0, 100.0],
+            [5.0, 2.0, 30.0, 500.0],
+            [200.0, 100.0, 500.0, 50000.0],
+        ],
+        size=50,
     )
 
     # Species 2: Chinstrap (medium size, longer bills)
     chinstrap = np.random.multivariate_normal(
         mean=[48.5, 18.4, 195.0, 3700.0],
-        cov=[[4.0, -0.1, 8.0, 150.0],
-             [-0.1, 1.2, 1.5, 80.0],
-             [8.0, 1.5, 25.0, 400.0],
-             [150.0, 80.0, 400.0, 45000.0]],
-        size=68
+        cov=[
+            [4.0, -0.1, 8.0, 150.0],
+            [-0.1, 1.2, 1.5, 80.0],
+            [8.0, 1.5, 25.0, 400.0],
+            [150.0, 80.0, 400.0, 45000.0],
+        ],
+        size=68,
     )
 
     # Species 3: Gentoo (larger, shorter bills, longer flippers)
     gentoo = np.random.multivariate_normal(
         mean=[47.5, 15.0, 217.0, 5000.0],
-        cov=[[5.0, 0.3, 12.0, 300.0],
-             [0.3, 1.5, 3.0, 120.0],
-             [12.0, 3.0, 40.0, 600.0],
-             [300.0, 120.0, 600.0, 80000.0]],
-        size=124
+        cov=[
+            [5.0, 0.3, 12.0, 300.0],
+            [0.3, 1.5, 3.0, 120.0],
+            [12.0, 3.0, 40.0, 600.0],
+            [300.0, 120.0, 600.0, 80000.0],
+        ],
+        size=124,
     )
 
     # Combine data
     data = np.vstack([adelie, chinstrap, gentoo])
-    df = pd.DataFrame(data, columns=['bill_length_mm', 'bill_depth_mm',
-                                   'flipper_length_mm', 'body_mass_g'])
+    df = pd.DataFrame(
+        data,
+        columns=["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"],
+    )
 
     # Standardize the data for better convergence
     scaled_data = (df - df.mean()) / df.std()
@@ -184,14 +192,22 @@ if __name__ == "__main__":
     np.random.seed(42)
 
     # Create 4 clusters with different centers
-    cluster1 = np.random.multivariate_normal([0, 0, 0], [[1.5, 0, 0], [0, 1.5, 0], [0, 0, 1.5]], 75)
-    cluster2 = np.random.multivariate_normal([5, 0, 0], [[1.5, 0, 0], [0, 1.5, 0], [0, 0, 1.5]], 75)
-    cluster3 = np.random.multivariate_normal([0, 5, 0], [[1.5, 0, 0], [0, 1.5, 0], [0, 0, 1.5]], 75)
-    cluster4 = np.random.multivariate_normal([0, 0, 5], [[1.5, 0, 0], [0, 1.5, 0], [0, 0, 1.5]], 75)
+    cluster1 = np.random.multivariate_normal(
+        [0, 0, 0], [[1.5, 0, 0], [0, 1.5, 0], [0, 0, 1.5]], 75
+    )
+    cluster2 = np.random.multivariate_normal(
+        [5, 0, 0], [[1.5, 0, 0], [0, 1.5, 0], [0, 0, 1.5]], 75
+    )
+    cluster3 = np.random.multivariate_normal(
+        [0, 5, 0], [[1.5, 0, 0], [0, 1.5, 0], [0, 0, 1.5]], 75
+    )
+    cluster4 = np.random.multivariate_normal(
+        [0, 0, 5], [[1.5, 0, 0], [0, 1.5, 0], [0, 0, 1.5]], 75
+    )
 
     X = np.vstack([cluster1, cluster2, cluster3, cluster4])
 
-    df = pd.DataFrame(X, columns=['feature_1', 'feature_2', 'feature_3'])
+    df = pd.DataFrame(X, columns=["feature_1", "feature_2", "feature_3"])
 
     # Standardize the data manually
     scaled_df = (df - df.mean()) / df.std()
@@ -208,7 +224,7 @@ if __name__ == "__main__":
         eta=2.0,
         sd=1.0,
         mu_prior_std=1.5,
-        ic="waic"
+        ic="waic",
     )
 
     print("Model Comparison Results:")
@@ -218,7 +234,7 @@ if __name__ == "__main__":
     az.plot_compare(comps)
     plt.title("Model Comparison: WAIC Scores")
     plt.tight_layout()
-    plt.savefig("./gmvm_model_comparison.png", dpi=300, bbox_inches='tight')
+    plt.savefig("./gmvm_model_comparison.png", dpi=300, bbox_inches="tight")
     plt.show()
 ```
 

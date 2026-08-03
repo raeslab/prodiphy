@@ -74,14 +74,14 @@ model.fit(
     count_cols=feature_cols,
     marker="CRP_mgL",
     covariates=[
-        ("age", "continuous"),       # z-scored
-        ("BMI", "continuous"),       # z-scored
+        ("age", "continuous"),  # z-scored
+        ("BMI", "continuous"),  # z-scored
         ("gender", {"m": 1, "f": 0}),  # explicit 0/1 binary contrast
     ],
-    method="nuts",                   # "advi"/"fullrank_advi" for a fast preview
+    method="nuts",  # "advi"/"fullrank_advi" for a fast preview
 )
 
-table = model.get_stats()            # ranked association table
+table = model.get_stats()  # ranked association table
 ```
 
 Continuous covariates (and the marker) are z-scored before fitting, so all slopes are on a

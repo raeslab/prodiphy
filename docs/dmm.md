@@ -107,12 +107,9 @@ if __name__ == "__main__":
     # create a synthetic dataset with 4 clusters
     data = []
 
-    alphas = [[16,1,1,1,1],
-              [1,4,4,10,1],
-              [2,2,2,2,20],
-              [1,10,1,10,1]]
+    alphas = [[16, 1, 1, 1, 1], [1, 4, 4, 10, 1], [2, 2, 2, 2, 20], [1, 10, 1, 10, 1]]
 
-    sample_count = [200,200,400,400]
+    sample_count = [200, 200, 400, 400]
 
     for i in range(4):
         alpha = alphas[i]
@@ -126,7 +123,17 @@ if __name__ == "__main__":
 
     # determine the optimal number of clusters (3, 4 or 5)
     clusters = [3, 4, 5]
-    comps = DMM.determine_best_cluster_count(df, cluster_sizes=clusters, tune=1000, samples=500, chains=2, cores=2, lower=10, upper=30, ic="waic")
+    comps = DMM.determine_best_cluster_count(
+        df,
+        cluster_sizes=clusters,
+        tune=1000,
+        samples=500,
+        chains=2,
+        cores=2,
+        lower=10,
+        upper=30,
+        ic="waic",
+    )
 
     az.plot_compare(comps)
 
@@ -155,11 +162,9 @@ if __name__ == "__main__":
     # create a synthetic dataset with 3 clusters
     data = []
 
-    alphas = [[16,1,1,1,1],
-              [1,4,4,10,1],
-              [2,2,2,2,20]]
+    alphas = [[16, 1, 1, 1, 1], [1, 4, 4, 10, 1], [2, 2, 2, 2, 20]]
 
-    sample_count = [200,200,400]
+    sample_count = [200, 200, 400]
 
     for i in range(3):
         alpha = alphas[i]
@@ -175,12 +180,10 @@ if __name__ == "__main__":
     model.fit(df, lower=10, upper=30)
     output = model.get_stats()
 
-
     clusters = model.get_clusters(df)
-    
+
     output.to_excel(f"./example_output.xlsx")
     clusters.to_excel(f"./example_clusters.xlsx")
-
 ```
 
 This will create two Excel files: `example_output.xlsx` will contain the parameters of the model and
