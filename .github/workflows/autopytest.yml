@@ -5,8 +5,13 @@ on:
   workflow_dispatch:
   push:
   schedule:
-    # execute once a week on monday 
+    # execute once a week on monday
     - cron:  '0 1 * * 1'
+
+# Only the coverage-badge commit needs write access; nothing else here does.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,32 +21,33 @@ jobs:
         python-version: ["3.10", "3.11", "3.12"]
 
     steps:
-      - uses: actions/checkout@v4
-        with: # https://github.com/stefanzweifel/git-auto-commit-action#checkout-the-correct-branch
-          ref: ${{ github.head_ref }}
+      - uses: actions/checkout@v5
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           architecture: 'x64'
-      - run: |
-          pip install .
-          pip install pytest
-          pip install pytest-cov
-          pip install pytest-xdist
+      - run: pip install ".[dev]"
       - name: Run tests
         run: |
-          pytest --exitfirst --verbose --failed-first --cov=src tests/ --cov-report=term-missing --cov-report=xml
-      - name: Generate Coverage Badge
+          pytest --verbose --cov=src tests/ --cov-report=term-missing --cov-report=xml
+
+      # The badge is committed back to the repository, so this must run exactly
+      # once (not once per matrix entry, which would race three pushes against
+      # each other) and only when HEAD is an actual branch. A tag push checks
+      # out a detached HEAD, which is what made the previous version die on
+      # "fatal: You are not currently on a branch".
+      - name: Update coverage badge
+        if: matrix.python-version == '3.12' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          pip install setuptools
-          pip install genbadge[coverage]         
+          pip install "genbadge[coverage]"
           genbadge coverage -i coverage.xml -o docs/coverage-badge.svg
-      - run: git diff --exit-code ./docs/coverage-badge.svg
-      - name: Update Coverage Badge if needed
-        if: failure()
-        run:  |
-          git config --local user.email '${GITHUB_ACTOR}@users.noreply.github.com'
-          git config --local user.name "update-coverage-badge[bot]"
-          git commit -am "Auto updating coverage badge"
-          git push
+          if git diff --quiet -- docs/coverage-badge.svg; then
+            echo "Coverage badge unchanged, nothing to commit."
+            exit 0
+          fi
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config user.name "update-coverage-badge[bot]"
+          git add docs/coverage-badge.svg
+          git commit -m "Auto updating coverage badge [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

@@ -54,7 +54,10 @@ dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "pytest-xdist>=3.0",
-    "ruff>=0.1.0",
+    # Pinned to a minor series: the formatter's output changes between minors,
+    # so an unpinned ruff makes CI fail on formatting developers cannot
+    # reproduce locally.
+    "ruff>=0.14.0,<0.15.0",
 ]
 
 [tool.setuptools]

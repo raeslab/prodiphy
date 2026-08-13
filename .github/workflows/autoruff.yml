@@ -1,26 +1,44 @@
 name: Run Ruff
 on: [ push ]
+
+# Only the auto-fix commit needs write access.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with: # https://github.com/stefanzweifel/git-auto-commit-action#checkout-the-correct-branch
-          ref: ${{ github.head_ref }}
+      - uses: actions/checkout@v5
       - name: Set up Python 3.10
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v6
         with:
           python-version: "3.10"
           architecture: 'x64'
-      - run: pip install ruff
-      - run: ruff check .
-      - run: ruff format --check .
-      - name: If needed, commit ruff changes to a new pull request
-        if: failure()
+      # Install ruff from the dev extra rather than unpinned, so CI and local
+      # checkouts agree. An unpinned `pip install ruff` drifts ahead of what
+      # developers have and fails on formatting they cannot reproduce.
+      - run: pip install ".[dev]"
+
+      - name: Check formatting and lint
+        id: ruff
+        run: |
+          ruff check .
+          ruff format --check .
+
+      # Only reachable when the check above failed. Restricted to the default
+      # branch: a tag push checks out a detached HEAD with no branch to push
+      # to, and on any other branch this would rewrite in-flight work.
+      - name: Commit ruff fixes if needed
+        if: failure() && steps.ruff.outcome == 'failure' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           ruff check --fix .
           ruff format .
-          git config --global user.name autoruff_push
-          git config --global user.email '${GITHUB_ACTOR}@users.noreply.github.com'
-          git commit -am "fixup! Format and lint Python code with ruff"
-          git push
+          if git diff --quiet; then
+            echo "Ruff reported problems that cannot be fixed automatically."
+            exit 1
+          fi
+          git config user.name "autoruff_push"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git commit -am "Format and lint Python code with ruff [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
