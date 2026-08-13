@@ -1,0 +1,5 @@
+# setuptools' default sdist rules only pick up tests/test*.py, which silently
+# dropped conftest.py and __init__.py and left downstream packagers with a test
+# suite that cannot run. Graft the whole directory instead.
+graft tests
+global-exclude __pycache__ *.py[cod]

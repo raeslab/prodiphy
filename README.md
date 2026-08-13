@@ -48,19 +48,19 @@ if __name__ == "__main__":
     summary = model.get_stats()
 ```
 
-For more details including the output of this example, see the [ProDir documentation](./docs/prodir.md).
+For more details including the output of this example, see the [ProDir documentation](https://github.com/raeslab/prodiphy/blob/main/docs/prodir.md).
 
 ## Usage
 
 The Prodiphy package contains various models each with their own specific use case. The following models are currently
 available:
 
-  * [ProDir](./docs/prodir.md): Model to compare the prevalence of specific classes in two populations. (Probabilistic alternative to a chi-square test)
-  * [CorProDir](./docs/corprodir.md): Model to compare the prevalence of specific classes in two populations while correcting for covariates.
-  * [DeltaSlope](./docs/deltaslope.md): Model to compare the slope, intercept and spread of a linear regression between two groups.
-  * [DMM](./docs/dmm.md): Dirichlet Multinomial Mixture model to detect clusters with different prevalence of classes.
-  * [GMvM](./docs/gmvm.md): Gaussian Multivariate Mixture model for clustering continuous multivariate data.
-  * [ACORN](./docs/acorn.md): Adjusted CORrelations, Negative-binomial. Hierarchical model testing whether every feature in a count table is associated with a continuous marker, adjusted for covariates.
+  * [ProDir](https://github.com/raeslab/prodiphy/blob/main/docs/prodir.md): Model to compare the prevalence of specific classes in two populations. (Probabilistic alternative to a chi-square test)
+  * [CorProDir](https://github.com/raeslab/prodiphy/blob/main/docs/corprodir.md): Model to compare the prevalence of specific classes in two populations while correcting for covariates.
+  * [DeltaSlope](https://github.com/raeslab/prodiphy/blob/main/docs/deltaslope.md): Model to compare the slope, intercept and spread of a linear regression between two groups.
+  * [DMM](https://github.com/raeslab/prodiphy/blob/main/docs/dmm.md): Dirichlet Multinomial Mixture model to detect clusters with different prevalence of classes.
+  * [GMvM](https://github.com/raeslab/prodiphy/blob/main/docs/gmvm.md): Gaussian Multivariate Mixture model for clustering continuous multivariate data.
+  * [ACORN](https://github.com/raeslab/prodiphy/blob/main/docs/acorn.md): Adjusted CORrelations, Negative-binomial. Hierarchical model testing whether every feature in a count table is associated with a continuous marker, adjusted for covariates.
 
 
 ## Contributing
