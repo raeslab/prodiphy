@@ -55,7 +55,7 @@ For more details including the output of this example, see the [ProDir documenta
 The Prodiphy package contains various models each with their own specific use case. The following models are currently
 available:
 
-  * [ProDir](./docs/prodir.md): Model to compare the prevalence of specific classes in two populations.
+  * [ProDir](./docs/prodir.md): Model to compare the prevalence of specific classes in two populations. (Probabilistic alternative to a chi-square test)
   * [CorProDir](./docs/corprodir.md): Model to compare the prevalence of specific classes in two populations while correcting for covariates.
   * [DeltaSlope](./docs/deltaslope.md): Model to compare the slope, intercept and spread of a linear regression between two groups.
   * [DMM](./docs/dmm.md): Dirichlet Multinomial Mixture model to detect clusters with different prevalence of classes.
