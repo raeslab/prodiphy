@@ -76,7 +76,6 @@ class ProDir:
             )
 
     def get_stats(self):
-
         var_names = []
 
         for label in self.labels:
