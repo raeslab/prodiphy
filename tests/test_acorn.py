@@ -234,3 +234,114 @@ def test_get_summary_with_unfitted_model():
     model = ACORN()
     with pytest.raises(ValueError):
         model.get_summary()
+
+
+def test_fit_rejects_non_dataframe(sample_data):
+    df, feature_names = sample_data
+    model = ACORN()
+    with pytest.raises(ValueError, match="DataFrame"):
+        model.fit(
+            df.to_numpy(), count_cols=feature_names, marker="marker", method="advi"
+        )
+
+
+def test_fit_rejects_constant_marker(sample_data):
+    """A marker without variance cannot be z-scored, so the fit is refused."""
+    df, feature_names = sample_data
+    df = df.assign(marker=1.0)
+    model = ACORN()
+    with pytest.raises(ValueError, match="variance"):
+        model.fit(df, count_cols=feature_names, marker="marker", method="advi")
+
+
+def test_fit_rejects_unknown_encoding(sample_data):
+    df, feature_names = sample_data
+    model = ACORN()
+    with pytest.raises(ValueError, match="must be 'continuous'"):
+        model.fit(
+            df,
+            count_cols=feature_names,
+            marker="marker",
+            covariates=[("age", "categorical")],
+            method="advi",
+        )
+
+
+def test_fit_with_no_complete_samples(sample_data):
+    """Samples missing the marker are dropped; if none remain the fit is refused."""
+    df, feature_names = sample_data
+    df = df.assign(marker=np.nan)
+    model = ACORN()
+    with pytest.raises(ValueError, match="No samples remain"):
+        model.fit(df, count_cols=feature_names, marker="marker", method="advi")
+
+
+def test_fit_with_offset_column(sample_data):
+    """
+    An explicit offset column is used as log(total) per sample. With the per-sample totals in that column it matches
+    the default offset computed from the count columns, and a different column changes the offset accordingly.
+    """
+    df, feature_names = sample_data
+    totals = df[feature_names].sum(axis=1)
+    df = df.assign(total=totals, double_total=2 * totals)
+
+    model = ACORN()
+    model.fit(
+        df,
+        count_cols=feature_names,
+        marker="marker",
+        offset=True,
+        offset_col="total",
+        method="advi",
+    )
+    assert model.trace is not None
+
+    from_col = model._build_model_data(df, feature_names, "marker", [], True, "total")
+    from_sum = model._build_model_data(df, feature_names, "marker", [], True, None)
+    doubled = model._build_model_data(
+        df, feature_names, "marker", [], True, "double_total"
+    )
+    np.testing.assert_allclose(from_col["offset"], from_sum["offset"])
+    np.testing.assert_allclose(doubled["offset"] - from_col["offset"], np.log(2))
+
+
+def test_fit_with_offset_column_missing(sample_data):
+    df, feature_names = sample_data
+    model = ACORN()
+    with pytest.raises(ValueError):
+        model.fit(
+            df,
+            count_cols=feature_names,
+            marker="marker",
+            offset=True,
+            offset_col="total",
+            method="advi",
+        )
+
+
+def test_fit_rejects_nonpositive_offset(sample_data):
+    """A log(total) offset is undefined for samples with a total of zero."""
+    df, feature_names = sample_data
+    df = df.assign(total=df[feature_names].sum(axis=1))
+    df.loc[0, "total"] = 0
+    model = ACORN()
+    with pytest.raises(ValueError, match="strictly positive"):
+        model.fit(
+            df,
+            count_cols=feature_names,
+            marker="marker",
+            offset=True,
+            offset_col="total",
+            method="advi",
+        )
+
+
+def test_fit_fullrank_advi(sample_data):
+    """The full-rank ADVI preview also recovers the planted marker association."""
+    df, feature_names = sample_data
+    model = ACORN(advi_iterations=10000, advi_draws=500)
+    model.fit(df, count_cols=feature_names, marker="marker", method="fullrank_advi")
+
+    table = model.get_stats()
+    assert table.iloc[0]["feature"] == "feat_signal"
+    assert table.iloc[0]["log_effect"] > 0

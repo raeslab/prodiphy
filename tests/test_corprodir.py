@@ -256,3 +256,27 @@ def test_corprodir_missing_category_in_target():
     assert stats_df.index.tolist() == labels
     assert np.isfinite(stats_df.to_numpy(dtype=float)).all()
     assert stats_df.loc["d", "mean_fraction"] < 0.1
+
+
+def test_corprodir_kind_response(sample_data):
+    """
+    With kind="response" the expected prevalence is the fraction of simulated outcomes, so every draw is a
+    multiple of 1 / n_target. With the default kind="response_params" it is an average of probabilities.
+    """
+    ref_df, target_df, labels = sample_data
+    n_target = len(target_df)
+
+    model = CorProDir(draws=100, chains=2, cores=2)
+    model.fit(ref_df, target_df, "label", ["age", "BMI"], kind="response")
+
+    assert model.kind == "response"
+    assert model.get_stats().shape == (len(labels), 20)
+    for label in labels:
+        scaled = model.final_data[f"{label}_prevalence_est"].to_numpy() * n_target
+        np.testing.assert_allclose(scaled, np.round(scaled), atol=1e-9)
+
+    model.fit(ref_df, target_df, "label", ["age", "BMI"])
+
+    assert model.kind == "response_params"
+    scaled = model.final_data[f"{labels[0]}_prevalence_est"].to_numpy() * n_target
+    assert not np.allclose(scaled, np.round(scaled))

@@ -327,3 +327,12 @@ def test_determine_best_cluster_count_with_custom_priors(sample_data):
     )
     assert isinstance(comps, pd.DataFrame)
     assert comps.shape[0] == 2
+
+
+def test_fit_with_unsupported_type():
+    """
+    Test fitting the GMvM model with data that is neither a DataFrame nor a numpy array.
+    """
+    model = GMvM(clusters=3, chains=1, cores=1, samples=50, tune=50)
+    with pytest.raises(ValueError):
+        model.fit([[1.0, 2.0], [3.0, 4.0]])
