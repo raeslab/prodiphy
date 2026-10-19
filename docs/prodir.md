@@ -62,13 +62,13 @@ $$
 \mathrm{LOR}_k = \log\left(\frac{p_{2k}}{1 - p_{2k}}\right) - \log\left(\frac{p_{1k}}{1 - p_{1k}}\right)
 $$
 
-$\mathrm{LOR}_k$ is the natural log of the one-vs-rest odds ratio (odds of class $k$ versus all other classes in
+$`\mathrm{LOR}_k`$ is the natural log of the one-vs-rest odds ratio (odds of class $k$ versus all other classes in
 group 2 compared to group 1). It is reported as `log_odds_ratio_<label>` and back-transformed as `odds_ratio_<label>`.
-The $+1$ pseudo-count keeps every $p_{gk}$ strictly between 0 and 1, so the odds ratio is finite in every draw, also for
+The $+1$ pseudo-count keeps every $`p_{gk}`$ strictly between 0 and 1, so the odds ratio is finite in every draw, also for
 classes with zero counts in one of the groups (similar in spirit to the Haldane-Anscombe $+0.5$ correction).
 
 Inference is performed by sampling from the posterior using PyMC's sampler; summary statistics (mean, SD, and HDI intervals)
-for $\Delta_k$, $R_k$, $\mathrm{LOR}_k$, the odds ratio and each $p_{gk}$ are returned.
+for $\Delta_k$, $R_k$, $`\mathrm{LOR}_k`$, the odds ratio and each $`p_{gk}`$ are returned.
 
 ## Example Usage
 

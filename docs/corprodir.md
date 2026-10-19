@@ -63,29 +63,28 @@ $$
 R_{k,s} = \log_2\left(\frac{p^{(T)}_{k,s}}{\hat{p}^{(R\to T)}_{k,s}}\right)
 $$
 $$
-\mathrm{LOR}_{k,s} = \log\left(\frac{p^{(T)}_{k,s}}{1 - p^{(T)}_{k,s}}\right)
-- \log\left(\frac{\hat{p}^{(R\to T)}_{k,s}}{1 - \hat{p}^{(R\to T)}_{k,s}}\right)
+\mathrm{LOR}_{k,s} = \log\left(\frac{p^{(T)}_{k,s}}{1 - p^{(T)}_{k,s}}\right) - \log\left(\frac{\hat{p}^{(R\to T)}_{k,s}}{1 - \hat{p}^{(R\to T)}_{k,s}}\right)
 $$
 
-$\mathrm{LOR}_{k}$ is the natural log of the one-vs-rest odds ratio: the odds of label $k$ (versus all other labels)
-in the target compared to the odds expected from the reference. It is reported on the log scale (mean, SD, HDI) and
-back-transformed as `odds_ratio` $= \exp(\mathrm{median}(\mathrm{LOR}_k))$ with the exponentiated HDI bounds.
+and summarizes them per label with posterior means, standard deviations, HDIs, and posterior sign probabilities
+$f_k^+ = \Pr(\Delta_k > 0)$ and $f_k^- = \Pr(\Delta_k < 0)$ estimated from sampled draws.
 
-Because $p^{(T)}_{k,s}$ is drawn from a Dirichlet with a $+1$ pseudo-count and $\hat{p}^{(R\to T)}_{k,s}$ is an average
-of softmax probabilities, both are strictly between 0 and 1, so every draw of $R_k$ and $\mathrm{LOR}_k$ is finite, also
-for labels that are absent from the target.
+$`\mathrm{LOR}_{k}`$ is the natural log of the one-vs-rest odds ratio: the odds of label $k$ (versus all other labels)
+in the target compared to the odds expected from the reference. It is reported on the log scale (mean, SD, HDI) and
+back-transformed as `odds_ratio` $`= \exp(\mathrm{median}(\mathrm{LOR}_k))`$ with the exponentiated HDI bounds.
+
+Because $`p^{(T)}_{k,s}`$ is drawn from a Dirichlet with a $+1$ pseudo-count and $`\hat{p}^{(R\to T)}_{k,s}`$ is an
+average of softmax probabilities, both are strictly between 0 and 1, so every draw of $`R_k`$ and $`\mathrm{LOR}_k`$ is
+finite, also for labels that are absent from the target.
 
 ### Prediction kind
 
 `fit()` accepts `kind="response_params"` (default) or `kind="response"`. The default averages the predicted class
-probabilities $\pi_{k,s}(\mathbf{z}^{(T)}_i)$ as in the formula above. `kind="response"` instead averages one simulated
-outcome per target individual from the posterior predictive distribution. That adds binomial noise to the expected
-prevalence and, for rare labels or small targets, gives draws where the expected prevalence is exactly 0, making
-$R_k$ and $\mathrm{LOR}_k$ infinite and the summary statistics unusable. See `comparison.html` in the repository root
-for a simulation study comparing both options.
-
-and summarizes them per label with posterior means, standard deviations, HDIs, and posterior sign probabilities
-$f_k^+ = \Pr(\Delta_k > 0)$ and $f_k^- = \Pr(\Delta_k < 0)$ estimated from sampled draws.
+probabilities $`\pi_{k,s}(\mathbf{z}^{(T)}_i)`$ as in the formula above. `kind="response"` instead averages one
+simulated outcome per target individual from the posterior predictive distribution. That adds binomial noise to the
+expected prevalence and, for rare labels or small targets, gives draws where the expected prevalence is exactly 0,
+making $`R_k`$ and $`\mathrm{LOR}_k`$ infinite and the summary statistics unusable. See `comparison.html` in the
+repository root for a simulation study comparing both options.
 
 ## Key Features
 
