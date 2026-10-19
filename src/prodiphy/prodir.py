@@ -1,6 +1,7 @@
 import arviz as az
 import numpy as np
 import pymc as pm
+import pytensor.tensor as pt
 
 
 class ProDir:
@@ -71,6 +72,15 @@ class ProDir:
                     f"log2_ratio_{label}", np.log2(group_2_p[ix] / group_1_p[ix])
                 )
 
+            # Add deterministic variables with the one-vs-rest odds ratio (natural log and back-transformed)
+            for ix, label in enumerate(self.labels):
+                log_odds_ratio = pm.Deterministic(
+                    f"log_odds_ratio_{label}",
+                    (pm.math.log(group_2_p[ix]) - pt.log1p(-group_2_p[ix]))
+                    - (pm.math.log(group_1_p[ix]) - pt.log1p(-group_1_p[ix])),
+                )
+                _ = pm.Deterministic(f"odds_ratio_{label}", pm.math.exp(log_odds_ratio))
+
             self.trace = pm.sample(
                 chains=self.chains, cores=self.cores, **sample_kwargs
             )
@@ -83,6 +93,8 @@ class ProDir:
             var_names.append(f"group_1_p_{label}")
             var_names.append(f"group_2_p_{label}")
             var_names.append(f"log2_ratio_{label}")
+            var_names.append(f"log_odds_ratio_{label}")
+            var_names.append(f"odds_ratio_{label}")
 
         summary_df = az.summary(self.trace, var_names=var_names)
 

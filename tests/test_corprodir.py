@@ -114,7 +114,7 @@ def test_corprodir(sample_data):
     assert stats_df.shape[0] == len(
         labels
     )  # should match the number of labels in the dataset
-    assert stats_df.shape[1] == 13
+    assert stats_df.shape[1] == 20
 
     for label in labels:
         assert label in stats_df["label"].tolist()
@@ -133,6 +133,13 @@ def test_corprodir(sample_data):
         "hdi_high_log2_ratio",
         "fraction_above_zero",
         "fraction_below_zero",
+        "mean_log_odds_ratio",
+        "std_log_odds_ratio",
+        "hdi_low_log_odds_ratio",
+        "hdi_high_log_odds_ratio",
+        "odds_ratio",
+        "hdi_low_odds_ratio",
+        "hdi_high_odds_ratio",
     ]
     for col in expected_columns:
         assert col in stats_df.columns
@@ -155,3 +162,97 @@ def test_corprodir_large(sample_data_large):
     stats_df = model.get_stats()
 
     assert isinstance(stats_df, pd.DataFrame)
+
+
+def test_corprodir_invalid_kind(sample_data):
+    """An unknown prediction kind is rejected before any sampling happens."""
+    ref_df, target_df, _ = sample_data
+
+    model = CorProDir(draws=100, chains=2, cores=2)
+
+    with pytest.raises(ValueError):
+        model.fit(ref_df, target_df, "label", ["age", "BMI"], kind="mean")
+
+
+def test_corprodir_does_not_mutate_input(sample_data):
+    """Fitting does not add the one-hot encoded columns to the caller's DataFrames."""
+    ref_df, target_df, _ = sample_data
+    ref_columns = ref_df.columns.tolist()
+    target_columns = target_df.columns.tolist()
+
+    model = CorProDir(draws=100, chains=2, cores=2)
+    model.fit(ref_df, target_df, "label", ["age", "BMI"])
+
+    assert ref_df.columns.tolist() == ref_columns
+    assert target_df.columns.tolist() == target_columns
+
+
+def test_corprodir_odds_ratio_recovery():
+    """
+    The one-vs-rest odds ratio (target vs expected) recovers the known value on synthetic data where the
+    confounders are unrelated to the label.
+    """
+    rng = np.random.default_rng(42)
+    labels = ["a", "b", "c", "d"]
+    ref_size = 2000
+    target_size = 2000
+    ref_prevalence = [0.25, 0.25, 0.25, 0.25]
+    target_prevalence = [0.4, 0.2, 0.2, 0.2]
+
+    ref_df = pd.DataFrame(
+        {
+            "age": rng.normal(size=ref_size),
+            "label": rng.choice(labels, size=ref_size, p=ref_prevalence),
+        }
+    )
+    target_df = pd.DataFrame(
+        {
+            "age": rng.normal(size=target_size),
+            "label": rng.choice(labels, size=target_size, p=target_prevalence),
+        }
+    )
+
+    model = CorProDir(draws=300, chains=2, cores=2)
+    model.fit(ref_df, target_df, "label", ["age"])
+
+    stats_df = model.get_stats().set_index("label")
+
+    expected = {"a": (0.4 / 0.6) / (0.25 / 0.75), "b": (0.2 / 0.8) / (0.25 / 0.75)}
+    for label, odds_ratio in expected.items():
+        assert stats_df.loc[label, "hdi_low_odds_ratio"] < odds_ratio
+        assert stats_df.loc[label, "hdi_high_odds_ratio"] > odds_ratio
+    assert stats_df.loc["a", "hdi_low_odds_ratio"] > 1
+    assert stats_df.loc["b", "hdi_high_odds_ratio"] < 1
+
+
+def test_corprodir_missing_category_in_target():
+    """
+    A label present in the reference but absent from a small target gives finite summaries with
+    kind="response_params" (the default).
+    """
+    rng = np.random.default_rng(7)
+    labels = ["a", "b", "c", "d"]
+    ref_size = 400
+    target_size = 30
+
+    ref_df = pd.DataFrame(
+        {
+            "age": rng.normal(size=ref_size),
+            "label": rng.choice(labels, size=ref_size, p=[0.4, 0.3, 0.25, 0.05]),
+        }
+    )
+    target_df = pd.DataFrame(
+        {
+            "age": rng.normal(size=target_size),
+            "label": rng.choice(labels[:3], size=target_size, p=[0.4, 0.3, 0.3]),
+        }
+    )
+
+    model = CorProDir(draws=200, chains=2, cores=2)
+    model.fit(ref_df, target_df, "label", ["age"])
+
+    stats_df = model.get_stats().set_index("label")
+
+    assert stats_df.index.tolist() == labels
+    assert np.isfinite(stats_df.to_numpy(dtype=float)).all()
+    assert stats_df.loc["d", "mean_fraction"] < 0.1
