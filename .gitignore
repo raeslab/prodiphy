@@ -168,3 +168,6 @@ tmp/
 
 example*.py
 *.xlsx
+# Local simulation reports
+comparison.html
+comparison_pseudocount.html

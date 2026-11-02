@@ -280,3 +280,56 @@ def test_corprodir_kind_response(sample_data):
     assert model.kind == "response_params"
     scaled = model.final_data[f"{labels[0]}_prevalence_est"].to_numpy() * n_target
     assert not np.allclose(scaled, np.round(scaled))
+
+
+def test_corprodir_invalid_pseudocount(sample_data):
+    """A negative pseudocount is rejected before any sampling happens."""
+    ref_df, target_df, _ = sample_data
+
+    model = CorProDir(draws=100, chains=2, cores=2)
+    with pytest.raises(ValueError, match="pseudocount"):
+        model.fit(ref_df, target_df, "label", ["age", "BMI"], pseudocount=-1)
+
+
+def test_corprodir_kind_response_pseudocount():
+    """
+    With kind="response" a rare label gets draws without any simulated individual, giving infinite ratios.
+    A pseudocount smooths the simulated counts to (n_k + a) / (N + K * a), keeping all summaries finite.
+    """
+    rng = np.random.default_rng(3)
+    labels = ["a", "b", "c", "d"]
+    ref_size = 300
+    target_size = 20
+
+    ref_df = pd.DataFrame(
+        {
+            "age": rng.normal(size=ref_size),
+            "label": rng.choice(labels, size=ref_size, p=[0.4, 0.3, 0.27, 0.03]),
+        }
+    )
+    target_df = pd.DataFrame(
+        {
+            "age": rng.normal(size=target_size),
+            "label": rng.choice(labels, size=target_size, p=[0.4, 0.3, 0.27, 0.03]),
+        }
+    )
+
+    model = CorProDir(draws=200, chains=2, cores=2)
+    model.fit(ref_df, target_df, "label", ["age"], kind="response")
+
+    assert model.pseudocount == 0
+    raw = model.final_data[[f"{label}_prevalence_est" for label in labels]].to_numpy()
+    assert (raw == 0).any()
+    assert np.isinf(model.final_data["d_log_odds_ratio"]).any()
+
+    model.fit(ref_df, target_df, "label", ["age"], kind="response", pseudocount=1)
+
+    assert model.pseudocount == 1
+    smoothed = model.final_data[
+        [f"{label}_prevalence_est" for label in labels]
+    ].to_numpy()
+    assert (smoothed > 0).all()
+    np.testing.assert_allclose(smoothed.sum(axis=1), 1)
+    scaled = smoothed * (target_size + len(labels)) - 1
+    np.testing.assert_allclose(scaled, np.round(scaled), atol=1e-9)
+    assert np.isfinite(model.get_stats().drop(columns="label").to_numpy(float)).all()

@@ -86,6 +86,16 @@ expected prevalence and, for rare labels or small targets, gives draws where the
 making $`R_k`$ and $`\mathrm{LOR}_k`$ infinite and the summary statistics unusable. See `comparison.html` in the
 repository root for a simulation study comparing both options.
 
+With `kind="response"` the `pseudocount` argument of `fit()` (default `0`, i.e. off) smooths the simulated counts
+$`n_{k,s}`$ of the $`N`$ target individuals over the $`K`$ labels as
+
+```math
+\hat{p}^{(R\to T)}_{k,s} = \frac{n_{k,s} + a}{N + K a}
+```
+
+so every draw stays strictly between 0 and 1. `pseudocount=1` mirrors the $+1$ pseudo-count of the Dirichlet on the
+observed target, `0.5` is the Haldane-Anscombe correction. The argument is ignored with `kind="response_params"`.
+
 ## Key Features
 
 - Accounts for covariates (e.g., age, BMI) when comparing proportions between populations

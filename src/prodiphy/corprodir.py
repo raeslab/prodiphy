@@ -20,6 +20,7 @@ class CorProDir:
 
         self.formula = ""
         self.kind = "response_params"
+        self.pseudocount = 0
         self.labels = []
         self.model = None
         self.trace = None
@@ -54,17 +55,22 @@ class CorProDir:
         With `kind="response_params"` the predicted prevalence is the average of the predicted class
         probabilities over the target individuals, which is strictly between 0 and 1. With `kind="response"`
         it is the fraction of simulated outcomes, which can be exactly 0 (or 1) for a draw, resulting in
-        infinite ratios.
+        infinite ratios. A positive `pseudocount` a smooths those simulated counts n_k per draw to
+        (n_k + a) / (N + K * a), with N the number of target individuals and K the number of labels, which
+        keeps every draw strictly between 0 and 1.
         """
         self.final_data = pd.DataFrame()
 
         if self.kind == "response_params":
             predicted = self.trace.posterior["p"].values[0].mean(axis=1)
         else:
-            predicted = (
-                self.trace["posterior_predictive"][f"c({', '.join(self.labels)})"]
-                .values[0]
-                .mean(axis=1)
+            simulated = self.trace["posterior_predictive"][
+                f"c({', '.join(self.labels)})"
+            ].values[0]
+            n_target = simulated.shape[1]
+            counts = simulated.sum(axis=1)
+            predicted = (counts + self.pseudocount) / (
+                n_target + len(self.labels) * self.pseudocount
             )
 
         for ix, label in enumerate(self.labels):
@@ -157,6 +163,7 @@ class CorProDir:
         confounders,
         sample_kwargs: dict = None,
         kind: str = "response_params",
+        pseudocount: float = 0,
     ):
         """
         Fits the uncorrected Dirichlet model on the target and the confounder-corrected multinomial model on the
@@ -169,10 +176,17 @@ class CorProDir:
         :param sample_kwargs: Additional keyword arguments to pass to the bambi fit.
         :param kind: How the expected prevalence in the target is predicted. "response_params" (default) averages
             the predicted class probabilities, "response" averages simulated outcomes from the posterior predictive.
+        :param pseudocount: Only used with kind="response". Pseudo-count added to the simulated number of target
+            individuals in each label, per draw, before computing the expected prevalence. The default 0 adds
+            nothing, so labels without simulated individuals in a draw give infinite ratios; 1 matches the +1
+            pseudo-count of the Dirichlet on the observed target, 0.5 is the Haldane-Anscombe correction.
         """
         if kind not in ("response_params", "response"):
             raise ValueError("kind must be one of 'response_params' or 'response'")
+        if pseudocount < 0:
+            raise ValueError("pseudocount must be non-negative")
         self.kind = kind
+        self.pseudocount = pseudocount
 
         reference_df = reference_df.copy()
         target_df = target_df.copy()
