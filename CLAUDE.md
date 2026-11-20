@@ -4,11 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ProDiphy is a Python package that implements probabilistic models to compare (sub-)populations using Bayesian statistics. It provides six main models:
+ProDiphy is a Python package that implements probabilistic models to compare (sub-)populations using Bayesian statistics. It provides seven main models:
 
 - **ProDir**: Compare prevalence of specific classes in two populations using Dirichlet distributions
 - **CorProDir**: ProDir model with covariate correction using Bambi/hierarchical modeling
 - **DeltaSlope**: Compare slope, intercept and spread of linear regressions between two groups
+- **DeltaSlopeHierarchical**: DeltaSlope with hierarchical (non-centered) shrinkage of slopes and intercepts
 - **DMM**: Dirichlet Multinomial Mixture model to detect clusters with different prevalence patterns
 - **GMvM**: Gaussian Multivariate Mixture model for clustering continuous multivariate data
 - **ACORN**: Adjusted CORrelations, Negative-binomial; hierarchical NB model relating every feature in a count table to a continuous marker, adjusted for covariates
@@ -102,6 +103,11 @@ All models follow a consistent pattern:
 **DeltaSlope** (`deltaslope.py`): Linear regression comparison between two groups
 - Input: Two DataFrames with x,y data
 - Fits separate linear models per group and compares parameters
+
+**DeltaSlopeHierarchical** (`deltaslope_hierarchical.py`): Same API as DeltaSlope, with hierarchical shrinkage
+- Fits on z-scored x/y (pooled), back-transforms all reported parameters to the original scale
+- Slopes/intercepts are non-centered draws from a shared distribution; `sigma_slope_prior`/`sigma_intercept_prior` set shrinkage strength
+- All deltas are target - reference; also reports `*_at_mean_x` (fitted y at pooled mean of x)
 
 **DMM** (`dmm.py`): Mixture model for cluster detection
 - Uses Dirichlet-Multinomial distributions
